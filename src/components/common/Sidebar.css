@@ -1,0 +1,349 @@
+/* ==================== SIDEBAR WRAPPER ==================== */
+.sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 260px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  z-index: 1000;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.sidebar-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==================== SIDEBAR CONTAINER ==================== */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0;
+}
+
+/* ==================== BRAND ==================== */
+.sidebar-brand {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 15px !important;
+}
+
+.sidebar-brand .school-icon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+.sidebar-brand h4 {
+  font-size: 18px;
+  margin-bottom: 0;
+}
+
+/* ==================== SIDEBAR CONTENT ==================== */
+.sidebar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ==================== PROFILE SECTION ==================== */
+.sidebar-header {
+  padding: 15px 15px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-image-wrapper {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  padding: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-header h5 {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 8px;
+}
+
+.sidebar-header .badge {
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ==================== NAVIGATION ==================== */
+.sidebar-nav {
+  padding: 10px 0;
+  flex: 1;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 11px 20px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sidebar-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #667eea;
+  text-decoration: none;
+}
+
+.sidebar-link.active {
+  color: #ffffff;
+  background: rgba(102, 126, 234, 0.2);
+  border-left-color: #667eea;
+  font-weight: 500;
+}
+
+.sidebar-link .sidebar-icon {
+  width: 22px;
+  text-align: center;
+  margin-right: 12px;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.sidebar-link .sidebar-label {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.sidebar-link.text-danger:hover {
+  color: #ff6b6b !important;
+  background: rgba(255, 107, 107, 0.1);
+  border-left-color: #ff6b6b;
+}
+
+/* ==================== DIVIDER ==================== */
+.sidebar-divider {
+  margin: 5px 20px;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ==================== FOOTER ==================== */
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 15px !important;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+}
+
+/* ==================== MAIN NAVBAR (Public Pages Only) ==================== */
+.navbar-main {
+  height: 60px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+}
+
+.navbar-main .navbar-brand {
+  font-size: 20px;
+}
+
+/* ==================== MOBILE NAVBAR ==================== */
+.mobile-navbar {
+  height: 60px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+}
+
+.mobile-navbar .navbar-brand {
+  font-size: 18px;
+}
+
+.mobile-navbar .btn {
+  padding: 6px 10px;
+}
+
+/* ==================== OFFCANVAS ==================== */
+.sidebar-offcanvas {
+  width: 280px !important;
+  background: #1a1a2e;
+}
+
+.sidebar-offcanvas .offcanvas-header {
+  background: #1a1a2e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 20px;
+}
+
+.sidebar-offcanvas .offcanvas-header .btn-close {
+  filter: invert(1);
+}
+
+.sidebar-offcanvas .offcanvas-body {
+  padding: 0;
+  background: #1a1a2e;
+}
+
+/* ================================================================
+   ==================== MAIN CONTENT LAYOUT ====================
+   ================================================================ */
+
+/* ==================== WITH SIDEBAR (Desktop) ==================== */
+@media (min-width: 992px) {
+  .sidebar-wrapper {
+    display: block;
+  }
+  
+  .main-content:not(.public-page) {
+    margin-left: 260px !important;
+    padding: 30px !important;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+  }
+}
+
+/* ==================== WITHOUT SIDEBAR (Mobile) ==================== */
+@media (max-width: 991.98px) {
+  .sidebar-wrapper {
+    display: none;
+  }
+  
+  .main-content:not(.public-page) {
+    margin-left: 0 !important;
+    padding: 80px 15px 20px 15px !important;
+  }
+}
+
+/* ==================== PUBLIC PAGES (Home, Login) ==================== */
+.main-content.public-page {
+  margin-left: 0 !important;
+  padding: 0 !important;
+  min-height: 100vh;
+}
+
+/* For public pages - hide sidebar */
+.public-page .sidebar-wrapper {
+  display: none !important;
+}
+
+/* ==================== HERO SECTION ==================== */
+.hero-section {
+  min-height: 80vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.hero-section .container {
+  position: relative;
+  z-index: 2;
+  padding-top: 80px;
+}
+
+/* ==================== RESPONSIVE TABLETS ==================== */
+@media (max-width: 768px) {
+  .sidebar-offcanvas {
+    width: 100% !important;
+  }
+  
+  .profile-image-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .sidebar-link {
+    padding: 10px 15px;
+    font-size: 13px;
+  }
+  
+  .sidebar-brand h4 {
+    font-size: 16px;
+  }
+  
+  .sidebar-header h5 {
+    font-size: 14px;
+  }
+  
+  .navbar-main .navbar-brand {
+    font-size: 16px;
+  }
+}
+
+/* ==================== DARK MODE SUPPORT ==================== */
+@media (prefers-color-scheme: dark) {
+  .sidebar-wrapper {
+    background: linear-gradient(180deg, #0a0a1a 0%, #0f1a2e 50%, #0a1a3a 100%);
+  }
+  
+  .sidebar-offcanvas {
+    background: #0a0a1a;
+  }
+  
+  .sidebar-offcanvas .offcanvas-header {
+    background: #0a0a1a;
+  }
+  
+  .sidebar-offcanvas .offcanvas-body {
+    background: #0a0a1a;
+  }
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  .sidebar-wrapper {
+    display: none !important;
+  }
+  
+  .navbar-main {
+    display: none !important;
+  }
+  
+  .mobile-navbar {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
