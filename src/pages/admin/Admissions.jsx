@@ -8,7 +8,7 @@ import {
   FaSearch, FaFilter, FaEye, FaCheck, FaTimes, 
   FaDownload, FaSync, FaUserPlus, FaClock, 
   FaCheckCircle, FaTimesCircle, FaBan, FaFileAlt,
-  FaUsers, FaGraduationCap, FaTrash, FaPhone
+  FaUsers, FaTrash, FaPhone
 } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -18,7 +18,6 @@ const AdminAdmissions = () => {
   const [admissions, setAdmissions] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({});
   
@@ -46,10 +45,12 @@ const AdminAdmissions = () => {
 
   useEffect(() => {
     fetchAdmissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   useEffect(() => {
     fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ==================== FETCH DATA ====================
@@ -83,13 +84,10 @@ const AdminAdmissions = () => {
 
   const fetchStats = async () => {
     try {
-      setStatsLoading(true);
       const response = await axios.get('/api/admin/admissions/stats');
       setStats(response.data.data.stats);
     } catch (error) {
       console.error('Fetch stats error:', error);
-    } finally {
-      setStatsLoading(false);
     }
   };
 
@@ -102,11 +100,6 @@ const AdminAdmissions = () => {
       [name]: value,
       page: 1 // Reset page on filter change
     }));
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    fetchAdmissions();
   };
 
   const clearFilters = () => {

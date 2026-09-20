@@ -14,6 +14,7 @@ const ParentChildResults = () => {
 
   useEffect(() => {
     fetchResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [childId]);
 
   const fetchResults = async () => {

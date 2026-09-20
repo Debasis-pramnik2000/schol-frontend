@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Row, Col, Card, Table, Button, Form, 
-  Spinner, Alert, Badge 
+  Spinner, Badge 
 } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUser, FaCalendarAlt } from 'react-icons/fa';
 import axios from 'axios';
@@ -11,15 +11,14 @@ import moment from 'moment';
 const TeacherAttendance = () => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
-  const [students, setStudents] = useState([]);
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
   const [date, setDate] = useState(moment().format('YYYY-MM-DD'));
 
   useEffect(() => {
     fetchClasses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchClasses = async () => {
@@ -28,7 +27,6 @@ const TeacherAttendance = () => {
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
-      setError('Failed to load classes');
     } finally {
       setLoading(false);
     }
@@ -38,7 +36,6 @@ const TeacherAttendance = () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/teacher/classes/${classId}/students`);
-      setStudents(response.data.data.students);
       // Initialize attendance data
       const initialData = response.data.data.students.map(student => ({
         studentId: student._id,
@@ -62,7 +59,6 @@ const TeacherAttendance = () => {
     if (classId) {
       fetchStudents(classId);
     } else {
-      setStudents([]);
       setAttendanceData([]);
     }
   };
@@ -108,15 +104,6 @@ const TeacherAttendance = () => {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const getStatusBadge = (status) => {
-    const colors = {
-      'Present': 'success',
-      'Absent': 'danger',
-      'Late': 'warning'
-    };
-    return <Badge bg={colors[status]}>{status}</Badge>;
   };
 
   if (loading && classes.length === 0) {

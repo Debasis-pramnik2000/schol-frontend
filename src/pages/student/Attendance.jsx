@@ -26,6 +26,7 @@ const StudentAttendance = () => {
 
   useEffect(() => {
     fetchAttendanceHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAttendanceHistory = async () => {
@@ -96,7 +97,7 @@ const StudentAttendance = () => {
     setMarking(true);
 
     try {
-      const response = await axios.post('/api/student/attendance', {
+      await axios.post('/api/student/attendance', {
         latitude: location.latitude,
         longitude: location.longitude,
         accuracy: location.accuracy

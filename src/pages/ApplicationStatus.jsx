@@ -30,6 +30,7 @@ const ApplicationStatus = () => {
     if (appNoFromUrl) {
       handleSearch(null, appNoFromUrl);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = async (e, appNo = null) => {

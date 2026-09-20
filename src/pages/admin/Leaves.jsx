@@ -22,6 +22,7 @@ const AdminLeaves = () => {
 
   useEffect(() => {
     fetchLeaves(); // ✅ Fixed: Changed from fetchLeases to fetchLeaves
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   // ✅ Renamed function from fetchLeases to fetchLeaves

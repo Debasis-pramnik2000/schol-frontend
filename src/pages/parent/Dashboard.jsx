@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Badge, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaUsers, FaCalendarCheck, FaChartLine, FaBell, FaUserGraduate } from 'react-icons/fa';
+import { FaUsers, FaCalendarCheck, FaChartLine, FaBell } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import moment from 'moment';
@@ -14,6 +14,7 @@ const ParentDashboard = () => {
 
   useEffect(() => {
     fetchDashboard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDashboard = async () => {

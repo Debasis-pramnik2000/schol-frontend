@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Row, Col, Card, Table, Form, Spinner, Alert, Badge 
+  Container, Row, Col, Card, Table, Form, Spinner, Badge 
 } from 'react-bootstrap';
-import { FaChartLine, FaDownload } from 'react-icons/fa';
+import { FaChartLine } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -12,7 +12,6 @@ const TeacherAttendanceReport = () => {
   const [selectedClass, setSelectedClass] = useState('');
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [filters, setFilters] = useState({
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear()
@@ -20,6 +19,7 @@ const TeacherAttendanceReport = () => {
 
   useEffect(() => {
     fetchClasses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchClasses = async () => {
@@ -28,7 +28,6 @@ const TeacherAttendanceReport = () => {
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
-      setError('Failed to load classes');
     } finally {
       setLoading(false);
     }
@@ -49,7 +48,6 @@ const TeacherAttendanceReport = () => {
     } catch (error) {
       console.error('Error fetching report:', error);
       toast.error('Failed to load report');
-      setError('Failed to load report');
     } finally {
       setLoading(false);
     }
@@ -71,6 +69,7 @@ const TeacherAttendanceReport = () => {
     if (selectedClass) {
       fetchReport();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClass, filters]);
 
   if (loading && classes.length === 0) {

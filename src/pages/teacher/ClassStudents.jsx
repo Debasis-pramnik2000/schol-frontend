@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Spinner, Badge, Button } from 'react-bootstrap';
-import { FaUser, FaEnvelope, FaPhone, FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ const TeacherClassStudents = () => {
 
   useEffect(() => {
     fetchClassStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId]);
 
   const fetchClassStudents = async () => {

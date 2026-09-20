@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Spinner, Badge,Table,Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Button, Spinner, Badge, Table, Alert } from 'react-bootstrap';
 import { FaChartLine } from 'react-icons/fa';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -21,6 +21,7 @@ const AdminAttendanceReports = () => {
   useEffect(() => {
     fetchClasses();
     fetchReport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchClasses = async () => {

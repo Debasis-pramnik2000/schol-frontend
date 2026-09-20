@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Row, Col, Card, Table, Form, Button, Spinner, Alert, Badge 
+  Container, Row, Col, Card, Table, Form, Button, Spinner, Badge 
 } from 'react-bootstrap';
-import { FaPlus, FaSave, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaSave } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -13,13 +13,13 @@ const TeacherMarks = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
   const [examName, setExamName] = useState('');
   const [examDate, setExamDate] = useState(new Date().toISOString().split('T')[0]);
   const [marksData, setMarksData] = useState([]);
 
   useEffect(() => {
     fetchClasses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchClasses = async () => {
@@ -28,7 +28,6 @@ const TeacherMarks = () => {
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
-      setError('Failed to load classes');
     } finally {
       setLoading(false);
     }

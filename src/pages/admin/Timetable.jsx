@@ -34,7 +34,6 @@ const AdminTimetable = () => {
   const [error, setError] = useState('');
   const [classes, setClasses] = useState([]);
   const [teachers, setTeachers] = useState([]);
-  const [subjects, setSubjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
@@ -147,7 +146,7 @@ const AdminTimetable = () => {
     fetchTimetables();
     fetchClasses();
     fetchTeachers();
-    fetchSubjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchTimetables = async () => {
@@ -182,16 +181,6 @@ const AdminTimetable = () => {
       setTeachers(response.data.data.teachers || []);
     } catch (error) {
       console.error('Error fetching teachers:', error);
-    }
-  };
-
-  const fetchSubjects = async () => {
-    try {
-      const response = await axios.get('/api/admin/subjects');
-
-      setSubjects(response.data.data || []);
-    } catch (error) {
-      console.error('Error fetching subjects:', error);
     }
   };
 
@@ -419,10 +408,6 @@ const AdminTimetable = () => {
     });
 
     setShowModal(true);
-  };
-
-  const getDayTimetable = (day) => {
-    return timetables.filter((t) => t.day === day);
   };
 
   const getPeriodsForClass = (className, section, day) => {
