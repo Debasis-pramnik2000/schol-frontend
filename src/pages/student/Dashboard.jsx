@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Spinner, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Spinner,} from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { 
-  FaUserGraduate, 
+  
   FaCalendarCheck, 
   FaBook, 
-  FaBell,
-  FaClock,
   FaChartLine,
-  FaFileAlt,
   FaDownload
 } from 'react-icons/fa';
-import moment from 'moment';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
@@ -54,7 +50,7 @@ const StudentDashboard = () => {
     );
   }
 
-  const { student, attendance, timetable, notices, upcomingExams } = dashboardData;
+  const { student, attendance, timetable,} = dashboardData;
 
   return (
     <Container fluid className="py-4">

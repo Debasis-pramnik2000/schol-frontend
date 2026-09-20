@@ -31,7 +31,6 @@ import {
   FaUserFriends,
   FaFilePdf,
   FaCalendarCheck,
-  FaUser,
   FaUserPlus,
   FaUsers
 } from 'react-icons/fa';

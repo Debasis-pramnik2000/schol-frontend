@@ -21,7 +21,7 @@ const StudentAttendance = () => {
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [marking, setMarking] = useState(false);
-  const [error, setError] = useState('');
+  const [ setError] = useState('');
   const [locationError, setLocationError] = useState('');
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
@@ -26,16 +26,8 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // ✅ Load user on mount
-  useEffect(() => {
-    if (token) {
-      loadUser();
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  const loadUser = async () => {
+  // ✅ Load user (memoized)
+  const loadUser = useCallback(async () => {
     try {
       const response = await axios.get('/api/auth/me');
       setUser(response.data.user);
@@ -47,7 +39,16 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // ✅ Load user on mount
+  useEffect(() => {
+    if (token) {
+      loadUser();
+    } else {
+      setLoading(false);
+    }
+  }, [token, loadUser]);
 
   const login = async (username, password) => {
     try {

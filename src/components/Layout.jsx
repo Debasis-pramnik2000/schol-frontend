@@ -12,12 +12,6 @@ const Layout = ({ children }) => {
   // Check if current page is Home or Login (Public Pages)
   const isPublicPage = location.pathname === '/' || location.pathname === '/login';
 
-  // Check if current page is Dashboard (Authenticated Pages)
-  const isDashboard = location.pathname.includes('/dashboard') || 
-                      location.pathname.includes('/student') ||
-                      location.pathname.includes('/teacher') ||
-                      location.pathname.includes('/admin');
-
   return (
     <div className="app-wrapper">
       {/* ✅ Show Navbar ONLY on Public Pages (Home & Login) */}

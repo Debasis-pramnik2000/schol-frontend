@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaUser, FaCalendarCheck, FaChartLine } from 'react-icons/fa';
+import {  FaCalendarCheck, FaChartLine } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 

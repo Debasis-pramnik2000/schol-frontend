@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Button, Spinner, Alert, Image } from 'react-bootstrap';
-import { FaCamera, FaTrash, FaUpload } from 'react-icons/fa';
+import { FaCamera, FaTrash} from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaArrowLeft, FaUsers, FaSchool } from 'react-icons/fa';
 

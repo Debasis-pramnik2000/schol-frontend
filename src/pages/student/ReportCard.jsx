@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Table, Badge } from 'react-bootstrap';
-import { FaDownload, FaFilePdf, FaFileExcel, FaPrint } from 'react-icons/fa';
+import {  FaFilePdf, FaFileExcel, FaPrint } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import moment from 'moment';

@@ -20,11 +20,9 @@ import {
   FaEdit,
   FaTrash,
   FaCopy,
-  FaDownload,
-  FaPrint,
   FaClock,
   FaUserTie,
-  FaBook
+  
 } from 'react-icons/fa';
 
 import axios from 'axios';

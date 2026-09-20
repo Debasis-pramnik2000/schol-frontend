@@ -7,7 +7,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { 
   FaSearch, FaCheckCircle, FaTimesCircle, FaClock, 
   FaArrowLeft, FaUser, FaGraduationCap, FaCalendarAlt, 
-  FaPhone, FaIdCard, FaFileAlt, FaSchool, FaUserPlus,
+  FaPhone, FaFileAlt, FaSchool, FaUserPlus,
   FaBan
 } from 'react-icons/fa';
 import axios from 'axios';

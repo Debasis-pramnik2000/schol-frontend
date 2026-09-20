@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Container, Row, Col, Card, Button, Badge, 
   Spinner, Alert, Modal, Form
 } from 'react-bootstrap';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { 
-  FaArrowLeft, FaUser, FaPhone, FaIdCard, FaMapMarkerAlt,
-  FaGraduationCap, FaCalendarAlt, FaFileAlt, FaCheckCircle,
+  FaArrowLeft, FaUser, FaIdCard, FaMapMarkerAlt,
+  FaGraduationCap, FaFileAlt, FaCheckCircle,
   FaTimesCircle, FaClock, FaBan, FaEye, FaDownload,
-  FaCheck, FaTimes, FaTrash, FaVenusMars,
-  FaSchool, FaPrint, FaFilePdf, FaImage
+  FaCheck, FaTimes, FaTrash, FaPrint, FaFilePdf, FaImage
 } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -35,12 +34,8 @@ const AdminAdmissionDetail = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [remarks, setRemarks] = useState('');
 
-  useEffect(() => {
-    fetchAdmission();
-  }, [id]);
-
   // ==================== FETCH ====================
-  const fetchAdmission = async () => {
+  const fetchAdmission = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -59,7 +54,11 @@ const AdminAdmissionDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchAdmission();
+  }, [fetchAdmission]);
 
   // ✅ FIXED: Get full image URL
   const getImageUrl = (path) => {

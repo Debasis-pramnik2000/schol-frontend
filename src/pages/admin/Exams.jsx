@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner, Alert,Table,Badge,Modal } from 'react-bootstrap';
-import { FaPlus, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCheck } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import moment from 'moment';
