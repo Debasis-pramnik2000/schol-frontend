@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Table, Spinner, Badge } from 'react-bootstrap';
 import { FaArrowLeft, FaUser } from 'react-icons/fa';
 import axios from 'axios';
@@ -12,11 +12,8 @@ const TeacherStudentMarks = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchStudentMarks();
-  }, [studentId]);
-
-  const fetchStudentMarks = async () => {
+  // ✅ Fetch student marks (memoized)
+  const fetchStudentMarks = useCallback(async () => {
     try {
       const response = await axios.get(`/api/teacher/marks/student/${studentId}`);
       setStudent(response.data.data.student);
@@ -27,7 +24,12 @@ const TeacherStudentMarks = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [studentId]);
+
+  // ✅ Effect depends on the memoized function
+  useEffect(() => {
+    fetchStudentMarks();
+  }, [fetchStudentMarks]);
 
   const getGradeBadge = (grade) => {
     const colors = {

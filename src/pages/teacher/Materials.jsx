@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Row, Col, Card, Table, Button, Modal, Form, 
-  Spinner, Alert, Badge 
+  Spinner, Alert 
 } from 'react-bootstrap';
-import { FaPlus, FaTrash, FaDownload, FaFilePdf, FaFileWord, FaFilePowerpoint, FaFile } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaFilePdf, FaFileWord, FaFilePowerpoint, FaFile } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import moment from 'moment';

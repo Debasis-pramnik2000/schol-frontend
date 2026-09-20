@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Container, Row, Col, Card, Table, Spinner, Alert, 
   Badge, Form, Button, InputGroup 
 } from 'react-bootstrap';
 import { 
-  FaUsers, FaSearch, FaUser, FaBook, FaSchool, 
+  FaUsers, FaSearch, FaBook, FaSchool, 
   FaFilter, FaTimes, FaSync, FaDownload 
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -23,11 +23,7 @@ const TeacherMyStudents = () => {
   const [retryCount, setRetryCount] = useState(0);
 
   // ✅ Fetch students
-  useEffect(() => {
-    fetchStudents();
-  }, [search, filterClass, filterSection]);
-
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -54,13 +50,17 @@ const TeacherMyStudents = () => {
       if (retryCount < 3) {
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
-          fetchStudents();
         }, 2000);
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, filterClass, filterSection, retryCount]);
+
+  // ✅ Fetch students effect
+  useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
 
   // ✅ Get unique classes and sections for filter
   const getUniqueClasses = () => {
