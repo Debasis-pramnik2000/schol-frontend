@@ -257,10 +257,10 @@ const OnlineAdmission = () => {
 
       // ✅ Submit to API
       const response = await api.post('/api/admission/apply', submitData, {
-  headers: {
-    'Content-Type': 'multipart/form-data'
-  }
-});
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
       if (response.data.success) {
         setApplicationNumber(response.data.data.applicationNumber);
@@ -314,23 +314,23 @@ const OnlineAdmission = () => {
                 ABC School - Session 2024-2025
               </p>
             </Col>
-           <Col md={4} className="text-md-end mt-3 mt-md-0">
-  <Link
-    to="/"
-    className="btn btn-outline-light"
-    style={{
-      position: "fixed",
-      right: "20px",
-      top: "20px",
-      zIndex: 9999,
-      display: "flex",
-      alignItems: "center",
-      gap: "6px"
-    }}
-  >
-    <FaHome /> Back to Home
-  </Link>
-</Col>
+            <Col md={4} className="text-md-end mt-3 mt-md-0">
+              <Link
+                to="/"
+                className="btn btn-outline-light"
+                style={{
+                  position: "fixed",
+                  right: "20px",
+                  top: "20px",
+                  zIndex: 9999,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                <FaHome /> Back to Home
+              </Link>
+            </Col>
           </Row>
         </Container>
       </div>
@@ -342,11 +342,7 @@ const OnlineAdmission = () => {
             <strong>Error:</strong> {error}
           </Alert>
         )}
-      <Link to="/">
-              <Button variant="link" className="w-100">
-              <FaHome size={25} /> Back to Home
-              </Button>
-            </Link>     
+
         {/* Info Alert */}
         <Alert variant="info">
           <FaClipboardList className="me-2" />
