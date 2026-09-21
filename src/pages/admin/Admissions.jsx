@@ -10,7 +10,7 @@ import {
   FaCheckCircle, FaTimesCircle, FaBan, FaFileAlt,
   FaUsers, FaTrash, FaPhone
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -69,7 +69,7 @@ const AdminAdmissions = () => {
       params.append('sortBy', filters.sortBy);
       params.append('sortOrder', filters.sortOrder);
 
-      const response = await axios.get(`/api/admin/admissions?${params}`);
+      const response = await api.get(`/api/admin/admissions?${params}`);
       
       setAdmissions(response.data.data.admissions || []);
       setPagination(response.data.data.pagination || {});
@@ -84,7 +84,7 @@ const AdminAdmissions = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/admin/admissions/stats');
+      const response = await api.get('/api/admin/admissions/stats');
       setStats(response.data.data.stats);
     } catch (error) {
       console.error('Fetch stats error:', error);
@@ -98,7 +98,7 @@ const AdminAdmissions = () => {
     setFilters(prev => ({
       ...prev,
       [name]: value,
-      page: 1 // Reset page on filter change
+      page: 1
     }));
   };
 
@@ -131,7 +131,7 @@ const AdminAdmissions = () => {
 
     setSubmitting(true);
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `/api/admin/admissions/${selectedAdmission._id}/approve`,
         { remarks: remarks || 'Approved by admin' }
       );
@@ -182,7 +182,7 @@ const AdminAdmissions = () => {
 
     setSubmitting(true);
     try {
-      await axios.put(
+      await api.put(
         `/api/admin/admissions/${selectedAdmission._id}/reject`,
         { remarks }
       );
@@ -213,7 +213,7 @@ const AdminAdmissions = () => {
 
     setSubmitting(true);
     try {
-      await axios.delete(`/api/admin/admissions/${selectedAdmission._id}`);
+      await api.delete(`/api/admin/admissions/${selectedAdmission._id}`);
       toast.success('Admission deleted successfully');
       setShowDeleteModal(false);
       setSelectedAdmission(null);
@@ -238,7 +238,7 @@ const AdminAdmissions = () => {
     if (!window.confirm(`Approve ${selectedIds.length} admission(s)?`)) return;
 
     try {
-      const response = await axios.post('/api/admin/admissions/bulk-approve', {
+      const response = await api.post('/api/admin/admissions/bulk-approve', {
         admissionIds: selectedIds
       });
 
@@ -278,7 +278,7 @@ const AdminAdmissions = () => {
       const params = new URLSearchParams();
       if (filters.status) params.append('status', filters.status);
 
-      const response = await axios.get(
+      const response = await api.get(
         `/api/admin/admissions/export?${params}`,
         { responseType: 'blob' }
       );
@@ -506,7 +506,7 @@ const AdminAdmissions = () => {
                   <Spinner animation="border" variant="primary" />
                   <p className="mt-3 text-muted">Loading admissions...</p>
                 </div>
-              ) : admissions.length > 0 ? (
+              ) : (admissions || []).length > 0 ? (
                 <>
                   <div className="table-responsive">
                     <Table striped hover className="mb-0 admissions-table">
