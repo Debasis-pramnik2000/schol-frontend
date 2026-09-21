@@ -10,11 +10,11 @@ import {
   FaTimesCircle, FaClock, FaBan, FaEye, FaDownload,
   FaCheck, FaTimes, FaTrash, FaPrint, FaFilePdf, FaImage
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
-// ✅ FIXED: Backend URL for images
+// ✅ Backend URL for images
 const BACKEND_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
 
 const AdminAdmissionDetail = () => {
@@ -39,7 +39,7 @@ const AdminAdmissionDetail = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get(`/api/admin/admissions/${id}`);
+      const response = await api.get(`/api/admin/admissions/${id}`);
       
       console.log('📥 Admission Data:', response.data.data);
       console.log('📷 Photo:', response.data.data.studentPhoto);
@@ -60,33 +60,28 @@ const AdminAdmissionDetail = () => {
     fetchAdmission();
   }, [fetchAdmission]);
 
-  // ✅ FIXED: Get full image URL
+  // ✅ Get full image URL
   const getImageUrl = (path) => {
     if (!path) return null;
     
-    // If already full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If starts with /uploads
     if (path.startsWith('/uploads')) {
       return `${BACKEND_URL}${path}`;
     }
     
-    // If starts with uploads
     if (path.startsWith('uploads')) {
       return `${BACKEND_URL}/${path}`;
     }
     
-    // Default
     return `${BACKEND_URL}/${path}`;
   };
 
-  // ✅ FIXED: Check file type from path (with query string handling)
+  // ✅ Check file type from path
   const isImageFile = (path) => {
     if (!path) return false;
-    // Remove query string & hash
     let cleanPath = path.split('?')[0].split('#')[0];
     const parts = cleanPath.toLowerCase().split('.');
     if (parts.length < 2) return false;
@@ -104,7 +99,7 @@ const AdminAdmissionDetail = () => {
   const handleApprove = async () => {
     setSubmitting(true);
     try {
-      const response = await axios.put(
+      const response = await api.put(
         `/api/admin/admissions/${id}/approve`,
         { remarks: remarks || 'Approved by admin' }
       );
@@ -146,7 +141,7 @@ const AdminAdmissionDetail = () => {
 
     setSubmitting(true);
     try {
-      await axios.put(`/api/admin/admissions/${id}/reject`, { remarks });
+      await api.put(`/api/admin/admissions/${id}/reject`, { remarks });
       toast.success('Admission rejected successfully');
       setShowRejectModal(false);
       setRemarks('');
@@ -163,7 +158,7 @@ const AdminAdmissionDetail = () => {
   const handleDelete = async () => {
     setSubmitting(true);
     try {
-      await axios.delete(`/api/admin/admissions/${id}`);
+      await api.delete(`/api/admin/admissions/${id}`);
       toast.success('Admission deleted successfully');
       navigate('/admin/admissions');
     } catch (error) {
@@ -205,7 +200,7 @@ const AdminAdmissionDetail = () => {
     return config[status] || config['Pending'];
   };
 
-  // ✅ FIXED: Open image modal
+  // ✅ Open image modal
   const openImageModal = (imagePath, title) => {
     if (!imagePath) {
       toast.warning('No document available');
@@ -232,7 +227,7 @@ const AdminAdmissionDetail = () => {
     setShowImageModal(true);
   };
 
-  // ✅ FIXED: Download document
+  // ✅ Download document
   const downloadDocument = async (imagePath, filename) => {
     if (!imagePath) {
       toast.warning('No document available');
@@ -570,7 +565,6 @@ const AdminAdmissionDetail = () => {
               <strong>Documents</strong>
             </Card.Header>
             <Card.Body>
-              {/* Student Photo */}
               <DocumentCard
                 title="Student Photo"
                 imagePath={admission.studentPhoto}
@@ -582,7 +576,6 @@ const AdminAdmissionDetail = () => {
                 )}
               />
 
-              {/* Aadhaar Card */}
               <DocumentCard
                 title="Aadhaar Card"
                 imagePath={admission.aadhaarCard}
@@ -594,7 +587,6 @@ const AdminAdmissionDetail = () => {
                 )}
               />
 
-              {/* Leaving Certificate */}
               <DocumentCard
                 title="Leaving Certificate"
                 imagePath={admission.leavingCertificate}
@@ -606,7 +598,6 @@ const AdminAdmissionDetail = () => {
                 )}
               />
 
-              {/* Marksheet */}
               {admission.marksheet && (
                 <DocumentCard
                   title="Marksheet"
@@ -751,7 +742,7 @@ const AdminAdmissionDetail = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ==================== IMAGE PREVIEW MODAL (FIXED) ==================== */}
+      {/* ==================== IMAGE PREVIEW MODAL ==================== */}
       <Modal 
         show={showImageModal} 
         onHide={() => setShowImageModal(false)}
