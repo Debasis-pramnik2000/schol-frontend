@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner, Alert, Table, Badge, Modal } from 'react-bootstrap';
-import { FaPlus, FaCheck, FaTimes, FaClock, FaCalendarAlt } from 'react-icons/fa';
+import { FaPlus,  FaClock, } from 'react-icons/fa';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
