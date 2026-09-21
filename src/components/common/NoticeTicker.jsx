@@ -4,7 +4,7 @@ import {
   FaBell, FaDownload, FaFilePdf, 
   FaEye, FaCalendarAlt, FaUser 
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -24,7 +24,7 @@ const NoticeTicker = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get('/api/public/notices');
+      const response = await api.get('/api/public/notices');
       setNotices(response.data.data || []);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -36,7 +36,7 @@ const NoticeTicker = () => {
 
   const handleNoticeClick = async (notice) => {
     try {
-      const response = await axios.get(`/api/public/notices/${notice._id}`);
+      const response = await api.get(`/api/public/notices/${notice._id}`);
       setSelectedNotice(response.data.data);
       setShowModal(true);
     } catch (error) {
@@ -48,7 +48,7 @@ const NoticeTicker = () => {
   const downloadPDF = async (noticeId) => {
     setDownloading(true);
     try {
-      const response = await axios.get(`/api/public/notices/${noticeId}/pdf`, {
+      const response = await api.get(`/api/public/notices/${noticeId}/pdf`, {
         responseType: 'blob'
       });
 
@@ -85,7 +85,6 @@ const NoticeTicker = () => {
     return hoursDiff < 24;
   };
 
-  // ✅ Helper: Get file name from attachment (string or object)
   const getFileName = (att) => {
     if (typeof att === 'string') {
       return att.split('/').pop() || 'Attachment';
@@ -93,7 +92,6 @@ const NoticeTicker = () => {
     return att.fileName || 'Attachment';
   };
 
-  // ✅ Helper: Get file URL from attachment (string or object)
   const getFileUrl = (att) => {
     if (typeof att === 'string') {
       return att;
@@ -175,7 +173,6 @@ const NoticeTicker = () => {
         </Card.Body>
       </Card>
 
-      {/* Notice Detail Modal */}
       <Modal 
         show={showModal} 
         onHide={() => setShowModal(false)} 
@@ -191,7 +188,6 @@ const NoticeTicker = () => {
         <Modal.Body>
           {selectedNotice && (
             <div>
-              {/* Title */}
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <h4 className="mb-0">{selectedNotice.title}</h4>
                 <div className="d-flex gap-2">
@@ -208,7 +204,6 @@ const NoticeTicker = () => {
 
               <hr />
 
-              {/* Meta Info */}
               <div className="d-flex justify-content-between mb-3 flex-wrap gap-2">
                 <div className="text-muted small">
                   <FaUser className="me-1" />
@@ -226,14 +221,12 @@ const NoticeTicker = () => {
 
               <hr />
 
-              {/* Content */}
               <div className="notice-full-content mb-3">
                 <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8', marginBottom: 0 }}>
                   {selectedNotice.content}
                 </p>
               </div>
 
-              {/* ✅ Fixed: Attachments handling for both string and object */}
               {selectedNotice.attachments && selectedNotice.attachments.length > 0 && (
                 <div className="mb-3">
                   <h6>Attachments:</h6>

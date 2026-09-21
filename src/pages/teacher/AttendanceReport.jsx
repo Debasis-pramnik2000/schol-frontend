@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Row, Col, Card, Table, Form, Spinner, Badge 
+  Container, Row, Col, Card, Table, Form, Spinner, Badge, Button 
 } from 'react-bootstrap';
 import { FaChartLine } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
-import { Button } from 'react-bootstrap';
+
 const TeacherAttendanceReport = () => {
   const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState('');
@@ -24,7 +24,7 @@ const TeacherAttendanceReport = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/teacher/classes');
+      const response = await api.get('/api/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -41,7 +41,7 @@ const TeacherAttendanceReport = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(
+      const response = await api.get(
         `/api/teacher/attendance/report/${selectedClass}?month=${filters.month}&year=${filters.year}`
       );
       setReportData(response.data.data);
@@ -147,7 +147,6 @@ const TeacherAttendanceReport = () => {
 
           {reportData && (
             <>
-              {/* Summary */}
               <Row className="mb-4">
                 <Col md={4}>
                   <Card className="text-center shadow-sm">
@@ -179,7 +178,6 @@ const TeacherAttendanceReport = () => {
                 </Col>
               </Row>
 
-              {/* Student-wise Report */}
               <Card className="shadow-sm">
                 <Card.Header className="fw-bold">Student-wise Attendance</Card.Header>
                 <Card.Body>

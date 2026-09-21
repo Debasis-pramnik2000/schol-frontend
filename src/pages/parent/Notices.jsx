@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Badge } from 'react-bootstrap';
-import axios from 'axios';
+import api from '../../services/api';
 import moment from 'moment';
 import { FaCalendarAlt, FaUser } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -17,7 +17,7 @@ const ParentNotices = () => {
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/student/notices');
+      const response = await api.get('/api/student/notices');
       setNotices(response.data.data);
     } catch (error) {
       console.error('Error fetching notices:', error);

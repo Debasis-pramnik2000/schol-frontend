@@ -10,7 +10,7 @@ import {
   FaPhone, FaFileAlt, FaSchool, FaUserPlus,
   FaBan
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -24,7 +24,6 @@ const ApplicationStatus = () => {
   const [error, setError] = useState('');
   const [searched, setSearched] = useState(false);
 
-  // ✅ Auto-search if application number is in URL
   useEffect(() => {
     const appNoFromUrl = searchParams.get('appNo');
     if (appNoFromUrl) {
@@ -49,7 +48,7 @@ const ApplicationStatus = () => {
     setSearched(true);
 
     try {
-      const response = await axios.get(`/api/admission/status/${searchNumber}`);
+      const response = await api.get(`/api/admission/status/${searchNumber}`);
       
       if (response.data.success) {
         setApplication(response.data.data);
@@ -65,7 +64,6 @@ const ApplicationStatus = () => {
     }
   };
 
-  // ✅ Get Status Configuration
   const getStatusConfig = (status) => {
     switch (status) {
       case 'Pending':
@@ -113,7 +111,6 @@ const ApplicationStatus = () => {
 
   return (
     <div className="application-status-page">
-      {/* Header */}
       <div className="status-header">
         <Container>
           <Row className="align-items-center">
@@ -140,7 +137,6 @@ const ApplicationStatus = () => {
       </div>
 
       <Container className="py-5">
-        {/* ==================== SEARCH FORM ==================== */}
         <Row className="justify-content-center">
           <Col lg={8}>
             <Card className="shadow-sm status-search-card mb-4">
@@ -191,7 +187,6 @@ const ApplicationStatus = () => {
           </Col>
         </Row>
 
-        {/* ==================== LOADING ==================== */}
         {loading && (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
@@ -199,7 +194,6 @@ const ApplicationStatus = () => {
           </div>
         )}
 
-        {/* ==================== ERROR ==================== */}
         {error && !loading && (
           <Row className="justify-content-center">
             <Col lg={8}>
@@ -217,11 +211,9 @@ const ApplicationStatus = () => {
           </Row>
         )}
 
-        {/* ==================== APPLICATION DETAILS ==================== */}
         {application && !loading && (
           <Row className="justify-content-center">
             <Col lg={10}>
-              {/* Status Card */}
               <Card className={`shadow-sm mb-4 status-result-card border-0`}>
                 <Card.Body className="p-4 text-center">
                   <div className="mb-3">
@@ -242,7 +234,6 @@ const ApplicationStatus = () => {
                 </Card.Body>
               </Card>
 
-              {/* Application Info */}
               <Card className="shadow-sm mb-4 admission-detail-card">
                 <Card.Header className="bg-primary text-white">
                   <FaFileAlt className="me-2" />
@@ -341,7 +332,6 @@ const ApplicationStatus = () => {
                 </Card.Body>
               </Card>
 
-              {/* Approved - Show Next Steps */}
               {application.status === 'Approved' && (
                 <Card className="shadow-sm mb-4 border-success">
                   <Card.Header className="bg-success text-white">
@@ -362,14 +352,13 @@ const ApplicationStatus = () => {
                     </ul>
                     <Alert variant="info" className="mb-0">
                       <small>
-                        📞 For queries, call the school office: <strong>+91 12345 67890</strong>
+                        📞 For queries, call the school office: <strong>9153845926</strong>
                       </small>
                     </Alert>
                   </Card.Body>
                 </Card>
               )}
 
-              {/* Actions */}
               <div className="text-center">
                 <Button 
                   variant="outline-primary" 
@@ -391,7 +380,6 @@ const ApplicationStatus = () => {
           </Row>
         )}
 
-        {/* ==================== INITIAL STATE ==================== */}
         {!searched && !loading && !application && (
           <Row className="justify-content-center mt-3">
             <Col lg={8}>

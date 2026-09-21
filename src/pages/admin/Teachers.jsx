@@ -31,7 +31,7 @@ import {
   FaBriefcase
 } from 'react-icons/fa';
 
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const AdminTeachers = () => {
@@ -79,7 +79,7 @@ const AdminTeachers = () => {
     try {
       setLoading(true);
 
-      const response = await axios.get(
+      const response = await api.get(
         `/api/admin/teachers?page=${page}&limit=10`
       );
 
@@ -95,7 +95,7 @@ const AdminTeachers = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/admin/classes');
+      const response = await api.get('/api/admin/classes');
       setClasses(response.data.data || []);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -118,7 +118,6 @@ const AdminTeachers = () => {
         ? { street: formData.address }
         : {};
 
-      // Convert subject names into Teacher schema objects
       const formattedSubjects = Array.isArray(formData.subjects)
         ? formData.subjects
             .map((subject) => {
@@ -141,19 +140,18 @@ const AdminTeachers = () => {
         subjects: formattedSubjects
       };
 
-      // Password is not required while updating
       if (editingTeacher) {
         delete submitData.username;
         delete submitData.password;
 
-        await axios.put(
+        await api.put(
           `/api/admin/teachers/${editingTeacher._id}`,
           submitData
         );
 
         toast.success('Teacher updated successfully');
       } else {
-        await axios.post(
+        await api.post(
           '/api/admin/teachers',
           submitData
         );
@@ -183,7 +181,7 @@ const AdminTeachers = () => {
       )
     ) {
       try {
-        await axios.delete(
+        await api.delete(
           `/api/admin/teachers/${id}`
         );
 
@@ -211,7 +209,7 @@ const AdminTeachers = () => {
       newPassword.length >= 6
     ) {
       try {
-        await axios.put(
+        await api.put(
           `/api/admin/teachers/${id}/reset-password`,
           { newPassword }
         );
@@ -317,7 +315,7 @@ const AdminTeachers = () => {
         return;
       }
 
-      await axios.put(
+      await api.put(
         `/api/admin/classes/${selectedClass}/assign-teacher`,
         {
           teacherId: teacherUserId

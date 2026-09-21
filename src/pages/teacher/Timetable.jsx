@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Spinner, Badge } from 'react-bootstrap';
 import { FaClock } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 
 const TeacherTimetable = () => {
   const [timetable, setTimetable] = useState([]);
@@ -18,7 +18,7 @@ const TeacherTimetable = () => {
   const fetchTimetable = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/teacher/timetable');
+      const response = await api.get('/api/teacher/timetable');
       setTimetable(response.data.data);
     } catch (error) {
       console.error('Error fetching timetable:', error);
@@ -55,7 +55,6 @@ const TeacherTimetable = () => {
         <Col>
           <h2 className="mb-4">My Timetable</h2>
 
-          {/* Day selector */}
           <div className="d-flex gap-2 mb-4 flex-wrap">
             {days.map(day => {
               const hasClass = getDayTimetable(day)?.periods?.some(p => p.teacher?._id);
@@ -76,7 +75,6 @@ const TeacherTimetable = () => {
           </div>
 
           {selectedDay ? (
-            // Day-wise view
             (() => {
               const dayData = getDayTimetable(selectedDay);
               if (!dayData || !dayData.periods || dayData.periods.length === 0) {
@@ -126,7 +124,6 @@ const TeacherTimetable = () => {
               );
             })()
           ) : (
-            // Weekly view
             <Row>
               {days.map(day => {
                 const dayData = getDayTimetable(day);

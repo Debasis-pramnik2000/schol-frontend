@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Button } from 'react-bootstrap';
 import { FaUsers, FaBook, FaUserTie, FaArrowRight } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { Link } from 'react-router-dom';
 
 const TeacherClasses = () => {
@@ -16,7 +16,7 @@ const TeacherClasses = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/teacher/classes');
+      const response = await api.get('/api/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);

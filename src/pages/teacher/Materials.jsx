@@ -4,7 +4,7 @@ import {
   Spinner, Alert 
 } from 'react-bootstrap';
 import { FaPlus, FaTrash, FaFilePdf, FaFileWord, FaFilePowerpoint, FaFile } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -33,7 +33,7 @@ const TeacherMaterials = () => {
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/teacher/materials');
+      const response = await api.get('/api/teacher/materials');
       setMaterials(response.data.data);
     } catch (error) {
       console.error('Error fetching materials:', error);
@@ -45,7 +45,7 @@ const TeacherMaterials = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/teacher/classes');
+      const response = await api.get('/api/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -64,7 +64,7 @@ const TeacherMaterials = () => {
     setSubmitting(true);
 
     try {
-      await axios.post('/api/teacher/materials', formData);
+      await api.post('/api/teacher/materials', formData);
       toast.success('Study material uploaded successfully');
       setShowModal(false);
       resetForm();
@@ -79,7 +79,7 @@ const TeacherMaterials = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
-        await axios.delete(`/api/teacher/materials/${id}`);
+        await api.delete(`/api/teacher/materials/${id}`);
         toast.success('Material deleted successfully');
         fetchMaterials();
       } catch (error) {
@@ -193,7 +193,6 @@ const TeacherMaterials = () => {
         </Col>
       </Row>
 
-      {/* Upload Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Upload Study Material</Modal.Title>

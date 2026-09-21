@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Spinner, Badge, Button } from 'react-bootstrap';
 import { FaArrowLeft } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { useParams, Link } from 'react-router-dom';
 
 const TeacherClassStudents = () => {
@@ -18,7 +18,7 @@ const TeacherClassStudents = () => {
 
   const fetchClassStudents = async () => {
     try {
-      const response = await axios.get(`/api/teacher/classes/${classId}/students`);
+      const response = await api.get(`/api/teacher/classes/${classId}/students`);
       setClassData(response.data.data.class);
       setStudents(response.data.data.students);
     } catch (error) {

@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// ✅ HARDCODED Backend URL - Render
 const API_URL = 'https://scholl-backend-1.onrender.com';
 
 const api = axios.create({
@@ -10,23 +9,17 @@ const api = axios.create({
   }
 });
 
-// Add token to requests if it exists
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Handle response errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -34,7 +27,6 @@ api.interceptors.response.use(
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
-
     return Promise.reject(error);
   }
 );

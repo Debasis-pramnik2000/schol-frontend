@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner, Badge, Table, Alert } from 'react-bootstrap';
 import { FaChartLine } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -26,7 +26,7 @@ const AdminAttendanceReports = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/admin/classes');
+      const response = await api.get('/api/admin/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -42,7 +42,7 @@ const AdminAttendanceReports = () => {
       if (filters.month) params.append('month', filters.month);
       if (filters.year) params.append('year', filters.year);
 
-      const response = await axios.get(`/api/admin/attendance-reports?${params}`);
+      const response = await api.get(`/api/admin/attendance-reports?${params}`);
       setReportData(response.data.data);
     } catch (error) {
       console.error('Error fetching report:', error);
@@ -80,7 +80,6 @@ const AdminAttendanceReports = () => {
         <Col>
           <h2 className="mb-4">Attendance Reports</h2>
 
-          {/* Filters */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <Form onSubmit={handleApplyFilters}>
@@ -161,7 +160,6 @@ const AdminAttendanceReports = () => {
 
           {reportData && (
             <>
-              {/* Summary Cards */}
               <Row className="mb-4">
                 <Col md={3}>
                   <Card className="text-center shadow-sm">
@@ -197,7 +195,6 @@ const AdminAttendanceReports = () => {
                 </Col>
               </Row>
 
-              {/* Chart */}
               <Card className="shadow-sm mb-4">
                 <Card.Header className="fw-bold">Daily Attendance Breakdown</Card.Header>
                 <Card.Body>
@@ -216,7 +213,6 @@ const AdminAttendanceReports = () => {
                 </Card.Body>
               </Card>
 
-              {/* Detailed Records */}
               <Card className="shadow-sm">
                 <Card.Header className="fw-bold">Detailed Records</Card.Header>
                 <Card.Body>

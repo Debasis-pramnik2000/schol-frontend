@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Spinner, Alert, Badge,Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Spinner, Alert, Badge, Button } from 'react-bootstrap';
 import { FaArrowLeft, FaFileAlt, FaDownload } from 'react-icons/fa';
 import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -20,7 +20,7 @@ const ParentChildResults = () => {
   const fetchResults = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/parent/results/${childId}`);
+      const response = await api.get(`/api/parent/results/${childId}`);
       setData(response.data.data);
     } catch (error) {
       console.error('Error fetching results:', error);
@@ -47,7 +47,7 @@ const ParentChildResults = () => {
 
   const handleDownloadReport = async () => {
     try {
-      const response = await axios.get(`/api/student/report-card/${childId}`, {
+      const response = await api.get(`/api/student/report-card/${childId}`, {
         responseType: 'blob'
       });
       
@@ -97,14 +97,12 @@ const ParentChildResults = () => {
     <Container fluid className="py-4">
       <Row>
         <Col>
-          {/* Back Button */}
           <Link to="/parent/dashboard" className="text-decoration-none">
             <span className="btn btn-outline-secondary btn-sm mb-3">
               <FaArrowLeft className="me-1" /> Back to Dashboard
             </span>
           </Link>
 
-          {/* Header */}
           <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <div>
               <h2>Results</h2>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Table } from 'react-bootstrap';
-import axios from 'axios';
+import api from '../../services/api';
 
 const StudentTimetable = () => {
   const [timetable, setTimetable] = useState([]);
@@ -14,7 +14,7 @@ const StudentTimetable = () => {
   const fetchTimetable = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/student/timetable');
+      const response = await api.get('/api/student/timetable');
       setTimetable(response.data.data);
     } catch (error) {
       console.error('Error fetching timetable:', error);

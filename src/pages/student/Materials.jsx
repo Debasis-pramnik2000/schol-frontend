@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Badge, Button } from 'react-bootstrap';
 import { FaFilePdf, FaFileWord, FaFilePowerpoint, FaFile, FaDownload, FaUser, FaCalendarAlt, FaBook } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import moment from 'moment';
 import { toast } from 'react-toastify';
 
@@ -17,7 +17,7 @@ const StudentMaterials = () => {
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/student/materials');
+      const response = await api.get('/api/student/materials');
       setMaterials(response.data.data);
     } catch (error) {
       console.error('Error fetching materials:', error);

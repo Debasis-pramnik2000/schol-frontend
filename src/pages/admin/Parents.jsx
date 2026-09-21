@@ -7,7 +7,7 @@ import {
   FaPlus, FaEdit, FaTrash, FaKey, FaUser, 
   FaEnvelope, FaPhone, FaUsers, FaUserFriends 
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const AdminParents = () => {
@@ -40,7 +40,7 @@ const AdminParents = () => {
   const fetchParents = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/admin/parents?page=${page}&limit=10`);
+      const response = await api.get(`/api/admin/parents?page=${page}&limit=10`);
       setParents(response.data.data.parents);
       setPagination(response.data.data.pagination);
     } catch (error) {
@@ -53,7 +53,7 @@ const AdminParents = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('/api/admin/students?limit=1000');
+      const response = await api.get('/api/admin/students?limit=1000');
       setStudents(response.data.data.students);
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -88,10 +88,10 @@ const AdminParents = () => {
 
     try {
       if (editingParent) {
-        await axios.put(`/api/admin/parents/${editingParent._id}`, formData);
+        await api.put(`/api/admin/parents/${editingParent._id}`, formData);
         toast.success('Parent updated successfully');
       } else {
-        const response = await axios.post('/api/admin/parents', formData);
+        const response = await api.post('/api/admin/parents', formData);
         toast.success(`Parent created successfully! Username: ${response.data.data.credentials.username}, Password: ${response.data.data.credentials.password}`);
       }
       setShowModal(false);
@@ -107,7 +107,7 @@ const AdminParents = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this parent?')) {
       try {
-        await axios.delete(`/api/admin/parents/${id}`);
+        await api.delete(`/api/admin/parents/${id}`);
         toast.success('Parent deleted successfully');
         fetchParents();
       } catch (error) {
@@ -120,7 +120,7 @@ const AdminParents = () => {
     const newPassword = prompt('Enter new password (min 6 characters):');
     if (newPassword && newPassword.length >= 6) {
       try {
-        await axios.put(`/api/admin/parents/${id}/reset-password`, { newPassword });
+        await api.put(`/api/admin/parents/${id}/reset-password`, { newPassword });
         toast.success(`Password reset successfully! New password: ${newPassword}`);
       } catch (error) {
         toast.error(error.response?.data?.message || 'Failed to reset password');
@@ -309,7 +309,6 @@ const AdminParents = () => {
         </Col>
       </Row>
 
-      {/* Add/Edit Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>

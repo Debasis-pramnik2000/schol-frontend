@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner, Alert, Table, Badge, Modal } from 'react-bootstrap';
-import { FaPlus,  FaClock } from 'react-icons/fa';
-import axios from 'axios';
+import { FaPlus, FaClock } from 'react-icons/fa';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -26,7 +26,7 @@ const TeacherLeave = () => {
   const fetchLeaves = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/leave/my-leaves');
+      const response = await api.get('/api/leave/my-leaves');
       setLeaves(response.data.data.leaves);
       setStatistics(response.data.data.statistics);
     } catch (error) {
@@ -49,7 +49,7 @@ const TeacherLeave = () => {
     setSubmitting(true);
 
     try {
-      await axios.post('/api/leave/apply', formData);
+      await api.post('/api/leave/apply', formData);
       toast.success('Leave application submitted successfully!');
       setShowModal(false);
       resetForm();
@@ -101,7 +101,6 @@ const TeacherLeave = () => {
             </Button>
           </div>
 
-          {/* Statistics Cards */}
           <Row className="mb-4">
             <Col md={3} sm={6}>
               <Card className="text-center shadow-sm">
@@ -139,7 +138,6 @@ const TeacherLeave = () => {
             </Col>
           </Row>
 
-          {/* Leave List */}
           <Card className="shadow-sm">
             <Card.Body>
               {leaves.length > 0 ? (
@@ -183,7 +181,6 @@ const TeacherLeave = () => {
         </Col>
       </Row>
 
-      {/* Apply Leave Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Apply for Leave</Modal.Title>

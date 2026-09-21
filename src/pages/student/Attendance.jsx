@@ -12,7 +12,7 @@ import {
 } from 'react-bootstrap';
 import { FaMapMarkerAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import api from '../../services/api';
 import moment from 'moment';
 
 const StudentAttendance = () => {
@@ -21,7 +21,7 @@ const StudentAttendance = () => {
   const [attendanceHistory, setAttendanceHistory] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [marking, setMarking] = useState(false);
-  const [ setError] = useState('');
+  const [error, setError] = useState('');
   const [locationError, setLocationError] = useState('');
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const StudentAttendance = () => {
   const fetchAttendanceHistory = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/student/attendance');
+      const response = await api.get('/api/student/attendance');
       setAttendanceHistory(response.data.data.records);
       setStatistics(response.data.data.statistics);
     } catch (error) {
@@ -97,7 +97,7 @@ const StudentAttendance = () => {
     setMarking(true);
 
     try {
-      await axios.post('/api/student/attendance', {
+      await api.post('/api/student/attendance', {
         latitude: location.latitude,
         longitude: location.longitude,
         accuracy: location.accuracy
@@ -145,7 +145,12 @@ const StudentAttendance = () => {
         <Col lg={8} className="mx-auto">
           <h2 className="mb-4">Smart Attendance System</h2>
 
-          {/* Mark Attendance Card */}
+          {error && (
+            <Alert variant="danger" dismissible onClose={() => setError('')}>
+              {error}
+            </Alert>
+          )}
+
           <Card className="shadow-sm mb-4">
             <Card.Header className="fw-bold bg-primary text-white">
               <FaMapMarkerAlt className="me-2" />
@@ -218,7 +223,6 @@ const StudentAttendance = () => {
             </Card.Body>
           </Card>
 
-          {/* Statistics */}
           {statistics && (
             <Row className="mb-4">
               <Col md={3} sm={6}>
@@ -268,7 +272,6 @@ const StudentAttendance = () => {
             </Row>
           )}
 
-          {/* Attendance History */}
           <Card className="shadow-sm">
             <Card.Header className="fw-bold">
               Attendance History

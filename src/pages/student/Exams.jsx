@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Table, Badge } from 'react-bootstrap';
-import axios from 'axios';
+import api from '../../services/api';
 import moment from 'moment';
 
 const StudentExams = () => {
@@ -15,7 +15,7 @@ const StudentExams = () => {
   const fetchExams = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/student/exams');
+      const response = await api.get('/api/student/exams');
       setExams(response.data.data);
     } catch (error) {
       console.error('Error fetching exams:', error);

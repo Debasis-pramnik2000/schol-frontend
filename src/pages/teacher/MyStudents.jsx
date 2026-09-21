@@ -8,7 +8,7 @@ import {
   FaFilter, FaTimes, FaSync, FaDownload 
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const TeacherMyStudents = () => {
@@ -22,7 +22,6 @@ const TeacherMyStudents = () => {
   const [statistics, setStatistics] = useState({});
   const [retryCount, setRetryCount] = useState(0);
 
-  // ✅ Fetch students
   const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
@@ -33,7 +32,7 @@ const TeacherMyStudents = () => {
       if (filterClass) params.append('class', filterClass);
       if (filterSection) params.append('section', filterSection);
 
-      const response = await axios.get(`/api/teacher/students?${params}`);
+      const response = await api.get(`/api/teacher/students?${params}`);
       
       setStudents(response.data.data.students || []);
       setClasses(response.data.data.classes || []);
@@ -46,7 +45,6 @@ const TeacherMyStudents = () => {
       console.error('Error fetching students:', error);
       setError('Failed to load students. Please try again.');
       
-      // ✅ Retry logic
       if (retryCount < 3) {
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
@@ -57,12 +55,10 @@ const TeacherMyStudents = () => {
     }
   }, [search, filterClass, filterSection, retryCount]);
 
-  // ✅ Fetch students effect
   useEffect(() => {
     fetchStudents();
   }, [fetchStudents]);
 
-  // ✅ Get unique classes and sections for filter
   const getUniqueClasses = () => {
     return [...new Set(students.map(s => s.class))].filter(Boolean);
   };
@@ -72,14 +68,12 @@ const TeacherMyStudents = () => {
     return [...new Set(filtered.map(s => s.section))].filter(Boolean);
   };
 
-  // ✅ Clear filters
   const clearFilters = () => {
     setSearch('');
     setFilterClass('');
     setFilterSection('');
   };
 
-  // ✅ Export to CSV
   const exportToCSV = () => {
     if (students.length === 0) {
       toast.warning('No students to export');
@@ -138,7 +132,6 @@ const TeacherMyStudents = () => {
     <Container fluid className="py-4">
       <Row>
         <Col>
-          {/* Header */}
           <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
             <div>
               <h2 className="mb-1">My Students</h2>
@@ -167,7 +160,6 @@ const TeacherMyStudents = () => {
             </div>
           </div>
 
-          {/* Statistics Cards */}
           <Row className="mb-4">
             <Col md={3} sm={6}>
               <Card className="text-center shadow-sm">
@@ -217,7 +209,6 @@ const TeacherMyStudents = () => {
             </Col>
           </Row>
 
-          {/* Filters */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <Row>
@@ -276,7 +267,6 @@ const TeacherMyStudents = () => {
             </Card.Body>
           </Card>
 
-          {/* Students Table */}
           <Card className="shadow-sm">
             <Card.Body>
               {students.length > 0 ? (
@@ -323,7 +313,6 @@ const TeacherMyStudents = () => {
                             <Badge bg="secondary">{student.rollNumber}</Badge>
                           </td>
                           <td>
-                            {/* ✅ Show subjects */}
                             {student.teacherSubjects && student.teacherSubjects.length > 0 ? (
                               <div className="d-flex flex-wrap gap-1">
                                 {student.teacherSubjects.map((sub, i) => (
@@ -372,7 +361,6 @@ const TeacherMyStudents = () => {
             </Card.Body>
           </Card>
 
-          {/* Class-wise Summary */}
           {classes.length > 0 && students.length > 0 && (
             <Row className="mt-4">
               <Col>

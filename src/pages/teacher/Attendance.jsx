@@ -4,7 +4,7 @@ import {
   Spinner, Badge 
 } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUser, FaCalendarAlt } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -23,7 +23,7 @@ const TeacherAttendance = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/teacher/classes');
+      const response = await api.get('/api/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -35,8 +35,7 @@ const TeacherAttendance = () => {
   const fetchStudents = async (classId) => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/teacher/classes/${classId}/students`);
-      // Initialize attendance data
+      const response = await api.get(`/api/teacher/classes/${classId}/students`);
       const initialData = response.data.data.students.map(student => ({
         studentId: student._id,
         name: student.user?.name,
@@ -82,9 +81,8 @@ const TeacherAttendance = () => {
     try {
       const classData = classes.find(c => c._id === selectedClass);
       
-      // Submit each student's attendance
       const promises = attendanceData.map(attendance => {
-        return axios.post('/api/teacher/attendance', {
+        return api.post('/api/teacher/attendance', {
           studentId: attendance.studentId,
           class: classData.className,
           section: classData.section,
@@ -96,7 +94,6 @@ const TeacherAttendance = () => {
       await Promise.all(promises);
       toast.success('Attendance marked successfully!');
       
-      // Refresh data
       fetchStudents(selectedClass);
     } catch (error) {
       console.error('Error marking attendance:', error);

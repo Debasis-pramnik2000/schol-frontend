@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Table, Spinner, Badge } from 'react-bootstrap';
 import { FaArrowLeft, FaUser } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { useParams, Link } from 'react-router-dom';
 import moment from 'moment';
 
@@ -12,10 +12,9 @@ const TeacherStudentMarks = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ✅ Fetch student marks (memoized)
   const fetchStudentMarks = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/teacher/marks/student/${studentId}`);
+      const response = await api.get(`/api/teacher/marks/student/${studentId}`);
       setStudent(response.data.data.student);
       setResults(response.data.data.results);
     } catch (error) {
@@ -26,7 +25,6 @@ const TeacherStudentMarks = () => {
     }
   }, [studentId]);
 
-  // ✅ Effect depends on the memoized function
   useEffect(() => {
     fetchStudentMarks();
   }, [fetchStudentMarks]);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner, Alert,Table,Badge,Modal } from 'react-bootstrap';
 import { FaPlus, FaEdit, FaTrash, FaCheck } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -35,7 +35,7 @@ const AdminExams = () => {
   const fetchExams = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/admin/exams');
+      const response = await api.get('/api/admin/exams');
       setExams(response.data.data);
     } catch (error) {
       console.error('Error fetching exams:', error);
@@ -47,7 +47,7 @@ const AdminExams = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await axios.get('/api/admin/students?limit=1000');
+      const response = await api.get('/api/admin/students?limit=1000');
       setStudents(response.data.data.students);
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -56,7 +56,7 @@ const AdminExams = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/admin/classes');
+      const response = await api.get('/api/admin/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -99,10 +99,10 @@ const AdminExams = () => {
 
     try {
       if (editingExam) {
-        await axios.put(`/api/admin/exams/${editingExam._id}`, formData);
+        await api.put(`/api/admin/exams/${editingExam._id}`, formData);
         toast.success('Exam updated successfully');
       } else {
-        await axios.post('/api/admin/exams', formData);
+        await api.post('/api/admin/exams', formData);
         toast.success('Exam created successfully');
       }
       setShowModal(false);
@@ -117,7 +117,7 @@ const AdminExams = () => {
 
   const handlePublish = async (id) => {
     try {
-      await axios.put(`/api/admin/exams/${id}/publish`);
+      await api.put(`/api/admin/exams/${id}/publish`);
       toast.success('Result published successfully');
       fetchExams();
     } catch (error) {
@@ -128,7 +128,7 @@ const AdminExams = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this exam?')) {
       try {
-        await axios.delete(`/api/admin/exams/${id}`);
+        await api.delete(`/api/admin/exams/${id}`);
         toast.success('Exam deleted successfully');
         fetchExams();
       } catch (error) {
@@ -270,7 +270,6 @@ const AdminExams = () => {
         </Col>
       </Row>
 
-      {/* Add/Edit Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="xl">
         <Modal.Header closeButton>
           <Modal.Title>

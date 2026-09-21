@@ -22,10 +22,9 @@ import {
   FaCopy,
   FaClock,
   FaUserTie,
-  
 } from 'react-icons/fa';
 
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const AdminTimetable = () => {
@@ -46,78 +45,14 @@ const AdminTimetable = () => {
     section: 'A',
     day: 'Monday',
     periods: [
-      {
-        periodNumber: 1,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '09:00',
-        endTime: '09:45',
-        room: ''
-      },
-      {
-        periodNumber: 2,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '09:45',
-        endTime: '10:30',
-        room: ''
-      },
-      {
-        periodNumber: 3,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '10:45',
-        endTime: '11:30',
-        room: ''
-      },
-      {
-        periodNumber: 4,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '11:30',
-        endTime: '12:15',
-        room: ''
-      },
-      {
-        periodNumber: 5,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '12:15',
-        endTime: '13:00',
-        room: ''
-      },
-      {
-        periodNumber: 6,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '14:00',
-        endTime: '14:45',
-        room: ''
-      },
-      {
-        periodNumber: 7,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '14:45',
-        endTime: '15:30',
-        room: ''
-      },
-      {
-        periodNumber: 8,
-        subject: '',
-        subjectCode: '',
-        teacher: '',
-        startTime: '15:30',
-        endTime: '16:15',
-        room: ''
-      }
+      { periodNumber: 1, subject: '', subjectCode: '', teacher: '', startTime: '09:00', endTime: '09:45', room: '' },
+      { periodNumber: 2, subject: '', subjectCode: '', teacher: '', startTime: '09:45', endTime: '10:30', room: '' },
+      { periodNumber: 3, subject: '', subjectCode: '', teacher: '', startTime: '10:45', endTime: '11:30', room: '' },
+      { periodNumber: 4, subject: '', subjectCode: '', teacher: '', startTime: '11:30', endTime: '12:15', room: '' },
+      { periodNumber: 5, subject: '', subjectCode: '', teacher: '', startTime: '12:15', endTime: '13:00', room: '' },
+      { periodNumber: 6, subject: '', subjectCode: '', teacher: '', startTime: '14:00', endTime: '14:45', room: '' },
+      { periodNumber: 7, subject: '', subjectCode: '', teacher: '', startTime: '14:45', endTime: '15:30', room: '' },
+      { periodNumber: 8, subject: '', subjectCode: '', teacher: '', startTime: '15:30', endTime: '16:15', room: '' }
     ],
     academicYear: new Date().getFullYear().toString()
   });
@@ -153,7 +88,7 @@ const AdminTimetable = () => {
     try {
       setLoading(true);
 
-      const response = await axios.get('/api/admin/timetable');
+      const response = await api.get('/api/admin/timetable');
 
       setTimetables(response.data.data);
     } catch (error) {
@@ -166,7 +101,7 @@ const AdminTimetable = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/admin/classes');
+      const response = await api.get('/api/admin/classes');
 
       setClasses(response.data.data);
     } catch (error) {
@@ -176,7 +111,7 @@ const AdminTimetable = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get('/api/admin/teachers?limit=100');
+      const response = await api.get('/api/admin/teachers?limit=100');
 
       setTeachers(response.data.data.teachers || []);
     } catch (error) {
@@ -218,14 +153,14 @@ const AdminTimetable = () => {
       };
 
       if (editingTimetable) {
-        await axios.put(
+        await api.put(
           `/api/admin/timetable/${editingTimetable._id}`,
           submitData
         );
 
         toast.success('Timetable updated successfully');
       } else {
-        await axios.post('/api/admin/timetable', submitData);
+        await api.post('/api/admin/timetable', submitData);
 
         toast.success('Timetable created successfully');
       }
@@ -251,7 +186,7 @@ const AdminTimetable = () => {
       )
     ) {
       try {
-        await axios.delete(`/api/admin/timetable/${id}`);
+        await api.delete(`/api/admin/timetable/${id}`);
 
         toast.success('Timetable deleted successfully');
 
@@ -269,7 +204,7 @@ const AdminTimetable = () => {
     setSubmitting(true);
 
     try {
-      await axios.post(
+      await api.post(
         '/api/admin/timetable/copy',
         copyData
       );
@@ -295,78 +230,14 @@ const AdminTimetable = () => {
       section: 'A',
       day: 'Monday',
       periods: [
-        {
-          periodNumber: 1,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '09:00',
-          endTime: '09:45',
-          room: ''
-        },
-        {
-          periodNumber: 2,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '09:45',
-          endTime: '10:30',
-          room: ''
-        },
-        {
-          periodNumber: 3,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '10:45',
-          endTime: '11:30',
-          room: ''
-        },
-        {
-          periodNumber: 4,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '11:30',
-          endTime: '12:15',
-          room: ''
-        },
-        {
-          periodNumber: 5,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '12:15',
-          endTime: '13:00',
-          room: ''
-        },
-        {
-          periodNumber: 6,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '14:00',
-          endTime: '14:45',
-          room: ''
-        },
-        {
-          periodNumber: 7,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '14:45',
-          endTime: '15:30',
-          room: ''
-        },
-        {
-          periodNumber: 8,
-          subject: '',
-          subjectCode: '',
-          teacher: '',
-          startTime: '15:30',
-          endTime: '16:15',
-          room: ''
-        }
+        { periodNumber: 1, subject: '', subjectCode: '', teacher: '', startTime: '09:00', endTime: '09:45', room: '' },
+        { periodNumber: 2, subject: '', subjectCode: '', teacher: '', startTime: '09:45', endTime: '10:30', room: '' },
+        { periodNumber: 3, subject: '', subjectCode: '', teacher: '', startTime: '10:45', endTime: '11:30', room: '' },
+        { periodNumber: 4, subject: '', subjectCode: '', teacher: '', startTime: '11:30', endTime: '12:15', room: '' },
+        { periodNumber: 5, subject: '', subjectCode: '', teacher: '', startTime: '12:15', endTime: '13:00', room: '' },
+        { periodNumber: 6, subject: '', subjectCode: '', teacher: '', startTime: '14:00', endTime: '14:45', room: '' },
+        { periodNumber: 7, subject: '', subjectCode: '', teacher: '', startTime: '14:45', endTime: '15:30', room: '' },
+        { periodNumber: 8, subject: '', subjectCode: '', teacher: '', startTime: '15:30', endTime: '16:15', room: '' }
       ],
       academicYear: new Date().getFullYear().toString()
     });
@@ -392,13 +263,10 @@ const AdminTimetable = () => {
         periodNumber: p.periodNumber,
         subject: p.subject || '',
         subjectCode: p.subjectCode || '',
-
-        // User._id because Timetable.teacher references User
         teacher:
           typeof p.teacher === 'object'
             ? p.teacher?._id || ''
             : p.teacher || '',
-
         startTime: p.startTime || '09:00',
         endTime: p.endTime || '09:45',
         room: p.room || ''
@@ -424,7 +292,6 @@ const AdminTimetable = () => {
   const getTeacherName = (period) => {
     if (!period) return 'N/A';
 
-    // Backend populated User
     if (
       period.teacher &&
       typeof period.teacher === 'object'
@@ -436,7 +303,6 @@ const AdminTimetable = () => {
 
     if (!teacherId) return 'N/A';
 
-    // period.teacher is User._id
     const match = teachers.find(
       (teacher) =>
         teacher.user?._id === teacherId
@@ -548,15 +414,9 @@ const AdminTimetable = () => {
                             )
                           }
                         >
-                          <option value="A">
-                            A
-                          </option>
-                          <option value="B">
-                            B
-                          </option>
-                          <option value="C">
-                            C
-                          </option>
+                          <option value="A">A</option>
+                          <option value="B">B</option>
+                          <option value="C">C</option>
                         </Form.Select>
                       </Form.Group>
                     </Col>
@@ -590,9 +450,7 @@ const AdminTimetable = () => {
                                       selectedClass
                                 )
                                 .map((cls) => (
-                                  <th
-                                    key={cls._id}
-                                  >
+                                  <th key={cls._id}>
                                     {cls.className}-
                                     {cls.section}
                                   </th>
@@ -601,12 +459,8 @@ const AdminTimetable = () => {
                           </thead>
 
                           <tbody>
-                            {[
-                              1, 2, 3, 4, 5, 6, 7, 8
-                            ].map((periodNum) => (
-                              <tr
-                                key={periodNum}
-                              >
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((periodNum) => (
+                              <tr key={periodNum}>
                                 <td className="fw-bold">
                                   Period {periodNum}
                                 </td>
@@ -634,35 +488,24 @@ const AdminTimetable = () => {
                                       );
 
                                     return (
-                                      <td
-                                        key={cls._id}
-                                      >
+                                      <td key={cls._id}>
                                         {period ? (
                                           <div className="p-1">
                                             <div className="fw-bold">
-                                              {
-                                                period.subject
-                                              }
+                                              {period.subject}
                                             </div>
 
                                             <small className="text-muted">
                                               <FaUserTie className="me-1" />
 
-                                              {getTeacherName(
-                                                period
-                                              )}
+                                              {getTeacherName(period)}
                                             </small>
 
                                             <br />
 
                                             <small className="text-muted">
-                                              {
-                                                period.startTime
-                                              }{' '}
-                                              -{' '}
-                                              {
-                                                period.endTime
-                                              }
+                                              {period.startTime} -{' '}
+                                              {period.endTime}
                                             </small>
                                           </div>
                                         ) : (
@@ -707,36 +550,23 @@ const AdminTimetable = () => {
                       <tbody>
                         {timetables.map(
                           (timetable, index) => (
-                            <tr
-                              key={timetable._id}
-                            >
+                            <tr key={timetable._id}>
                               <td>{index + 1}</td>
 
-                              <td>
-                                {timetable.class}
-                              </td>
+                              <td>{timetable.class}</td>
 
-                              <td>
-                                {timetable.section}
-                              </td>
+                              <td>{timetable.section}</td>
 
-                              <td>
-                                {timetable.day}
-                              </td>
+                              <td>{timetable.day}</td>
 
                               <td>
                                 <Badge bg="info">
-                                  {timetable.periods
-                                    ?.length || 0}{' '}
+                                  {timetable.periods?.length || 0}{' '}
                                   Periods
                                 </Badge>
                               </td>
 
-                              <td>
-                                {
-                                  timetable.academicYear
-                                }
-                              </td>
+                              <td>{timetable.academicYear}</td>
 
                               <td>
                                 <div className="d-flex gap-2">
@@ -744,9 +574,7 @@ const AdminTimetable = () => {
                                     variant="outline-primary"
                                     size="sm"
                                     onClick={() =>
-                                      openEditModal(
-                                        timetable
-                                      )
+                                      openEditModal(timetable)
                                     }
                                   >
                                     <FaEdit />
@@ -756,9 +584,7 @@ const AdminTimetable = () => {
                                     variant="outline-danger"
                                     size="sm"
                                     onClick={() =>
-                                      handleDelete(
-                                        timetable._id
-                                      )
+                                      handleDelete(timetable._id)
                                     }
                                   >
                                     <FaTrash />
@@ -778,7 +604,6 @@ const AdminTimetable = () => {
         </Col>
       </Row>
 
-      {/* Add/Edit Modal */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -797,9 +622,7 @@ const AdminTimetable = () => {
             <Row>
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Class *
-                  </Form.Label>
+                  <Form.Label>Class *</Form.Label>
 
                   <Form.Select
                     name="class"
@@ -825,33 +648,23 @@ const AdminTimetable = () => {
 
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Section
-                  </Form.Label>
+                  <Form.Label>Section</Form.Label>
 
                   <Form.Select
                     name="section"
                     value={formData.section}
                     onChange={handleChange}
                   >
-                    <option value="A">
-                      A
-                    </option>
-                    <option value="B">
-                      B
-                    </option>
-                    <option value="C">
-                      C
-                    </option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
 
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Day *
-                  </Form.Label>
+                  <Form.Label>Day *</Form.Label>
 
                   <Form.Select
                     name="day"
@@ -873,25 +686,19 @@ const AdminTimetable = () => {
 
               <Col md={3}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Academic Year
-                  </Form.Label>
+                  <Form.Label>Academic Year</Form.Label>
 
                   <Form.Control
                     type="text"
                     name="academicYear"
-                    value={
-                      formData.academicYear
-                    }
+                    value={formData.academicYear}
                     onChange={handleChange}
                   />
                 </Form.Group>
               </Col>
             </Row>
 
-            <h6 className="mt-3">
-              Periods
-            </h6>
+            <h6 className="mt-3">Periods</h6>
 
             <div className="table-responsive">
               <Table bordered size="sm">
@@ -919,9 +726,7 @@ const AdminTimetable = () => {
                           <Form.Control
                             type="text"
                             placeholder="Subject"
-                            value={
-                              period.subject
-                            }
+                            value={period.subject}
                             onChange={(e) =>
                               handlePeriodChange(
                                 index,
@@ -937,9 +742,7 @@ const AdminTimetable = () => {
                           <Form.Control
                             type="text"
                             placeholder="Code"
-                            value={
-                              period.subjectCode
-                            }
+                            value={period.subjectCode}
                             onChange={(e) =>
                               handlePeriodChange(
                                 index,
@@ -948,17 +751,13 @@ const AdminTimetable = () => {
                               )
                             }
                             size="sm"
-                            style={{
-                              width: '80px'
-                            }}
+                            style={{ width: '80px' }}
                           />
                         </td>
 
                         <td>
                           <Form.Select
-                            value={
-                              period.teacher
-                            }
+                            value={period.teacher}
                             onChange={(e) =>
                               handlePeriodChange(
                                 index,
@@ -975,17 +774,8 @@ const AdminTimetable = () => {
                             {teachers.map(
                               (teacher) => (
                                 <option
-                                  key={
-                                    teacher._id
-                                  }
-
-                                  // FIX:
-                                  // Timetable.teacher references User
-                                  // So save Teacher.user._id
-                                  value={
-                                    teacher.user?._id ||
-                                    ''
-                                  }
+                                  key={teacher._id}
+                                  value={teacher.user?._id || ''}
                                 >
                                   {teacher.user?.name ||
                                     'Unknown Teacher'}
@@ -998,9 +788,7 @@ const AdminTimetable = () => {
                         <td>
                           <Form.Control
                             type="time"
-                            value={
-                              period.startTime
-                            }
+                            value={period.startTime}
                             onChange={(e) =>
                               handlePeriodChange(
                                 index,
@@ -1015,9 +803,7 @@ const AdminTimetable = () => {
                         <td>
                           <Form.Control
                             type="time"
-                            value={
-                              period.endTime
-                            }
+                            value={period.endTime}
                             onChange={(e) =>
                               handlePeriodChange(
                                 index,
@@ -1033,9 +819,7 @@ const AdminTimetable = () => {
                           <Form.Control
                             type="text"
                             placeholder="Room"
-                            value={
-                              period.room
-                            }
+                            value={period.room}
                             onChange={(e) =>
                               handlePeriodChange(
                                 index,
@@ -1079,7 +863,6 @@ const AdminTimetable = () => {
         </Form>
       </Modal>
 
-      {/* Copy Modal */}
       <Modal
         show={showCopyModal}
         onHide={() =>
@@ -1099,14 +882,10 @@ const AdminTimetable = () => {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Class
-                  </Form.Label>
+                  <Form.Label>Class</Form.Label>
 
                   <Form.Select
-                    value={
-                      copyData.fromClass
-                    }
+                    value={copyData.fromClass}
                     onChange={(e) =>
                       setCopyData({
                         ...copyData,
@@ -1133,14 +912,10 @@ const AdminTimetable = () => {
 
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Section
-                  </Form.Label>
+                  <Form.Label>Section</Form.Label>
 
                   <Form.Select
-                    value={
-                      copyData.fromSection
-                    }
+                    value={copyData.fromSection}
                     onChange={(e) =>
                       setCopyData({
                         ...copyData,
@@ -1149,15 +924,9 @@ const AdminTimetable = () => {
                       })
                     }
                   >
-                    <option value="A">
-                      A
-                    </option>
-                    <option value="B">
-                      B
-                    </option>
-                    <option value="C">
-                      C
-                    </option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -1168,14 +937,10 @@ const AdminTimetable = () => {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Class
-                  </Form.Label>
+                  <Form.Label>Class</Form.Label>
 
                   <Form.Select
-                    value={
-                      copyData.toClass
-                    }
+                    value={copyData.toClass}
                     onChange={(e) =>
                       setCopyData({
                         ...copyData,
@@ -1202,14 +967,10 @@ const AdminTimetable = () => {
 
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>
-                    Section
-                  </Form.Label>
+                  <Form.Label>Section</Form.Label>
 
                   <Form.Select
-                    value={
-                      copyData.toSection
-                    }
+                    value={copyData.toSection}
                     onChange={(e) =>
                       setCopyData({
                         ...copyData,
@@ -1218,15 +979,9 @@ const AdminTimetable = () => {
                       })
                     }
                   >
-                    <option value="A">
-                      A
-                    </option>
-                    <option value="B">
-                      B
-                    </option>
-                    <option value="C">
-                      C
-                    </option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -1239,9 +994,7 @@ const AdminTimetable = () => {
 
               <Form.Control
                 type="text"
-                value={
-                  copyData.academicYear
-                }
+                value={copyData.academicYear}
                 onChange={(e) =>
                   setCopyData({
                     ...copyData,

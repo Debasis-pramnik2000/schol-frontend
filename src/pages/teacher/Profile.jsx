@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Alert, Image, Badge } from 're
 import { useAuth } from '../../context/AuthContext';
 import ProfilePhotoUpload from '../../components/common/ProfilePhotoUpload';
 import { FaUser, FaEnvelope, FaPhone, FaChalkboardTeacher } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const TeacherProfile = () => {
@@ -32,7 +32,7 @@ const TeacherProfile = () => {
     setSuccess('');
 
     try {
-      await axios.put('/api/teacher/profile', formData);
+      await api.put('/api/teacher/profile', formData);
       await updateProfile(formData);
       setSuccess('Profile updated successfully!');
       toast.success('Profile updated successfully!');
@@ -64,7 +64,6 @@ const TeacherProfile = () => {
             </Alert>
           )}
 
-          {/* ✅ Profile Photo Upload */}
           <Card className="shadow-sm mb-4">
             <Card.Header className="fw-bold">
               <FaChalkboardTeacher className="me-2" />
@@ -79,7 +78,6 @@ const TeacherProfile = () => {
             </Card.Body>
           </Card>
 
-          {/* Profile Info Card */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <Row className="align-items-center">
@@ -119,7 +117,6 @@ const TeacherProfile = () => {
             </Card.Body>
           </Card>
 
-          {/* Edit Profile Form */}
           <Card className="shadow-sm">
             <Card.Header className="fw-bold">Edit Profile</Card.Header>
             <Card.Body>

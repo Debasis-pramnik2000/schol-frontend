@@ -23,7 +23,7 @@ import {
   FaSchool
 } from 'react-icons/fa';
 
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const AdminClasses = () => {
@@ -59,7 +59,7 @@ const AdminClasses = () => {
     try {
       setLoading(true);
 
-      const response = await axios.get('/api/admin/classes');
+      const response = await api.get('/api/admin/classes');
 
       setClasses(response.data.data || []);
       setError('');
@@ -73,7 +73,7 @@ const AdminClasses = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         '/api/admin/teachers?limit=100'
       );
 
@@ -87,7 +87,7 @@ const AdminClasses = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         '/api/admin/subjects'
       );
 
@@ -112,7 +112,7 @@ const AdminClasses = () => {
       let classId;
 
       if (editingClass) {
-        const response = await axios.put(
+        const response = await api.put(
           `/api/admin/classes/${editingClass._id}`,
           {
             className: formData.className,
@@ -129,7 +129,7 @@ const AdminClasses = () => {
           editingClass._id;
 
         if (formData.classTeacher) {
-          await axios.put(
+          await api.put(
             `/api/admin/classes/${classId}/assign-teacher`,
             {
               teacherId: formData.classTeacher
@@ -141,7 +141,7 @@ const AdminClasses = () => {
           'Class updated successfully'
         );
       } else {
-        const response = await axios.post(
+        const response = await api.post(
           '/api/admin/classes',
           {
             className: formData.className,
@@ -160,7 +160,7 @@ const AdminClasses = () => {
           classId &&
           formData.classTeacher
         ) {
-          await axios.put(
+          await api.put(
             `/api/admin/classes/${classId}/assign-teacher`,
             {
               teacherId: formData.classTeacher
@@ -198,7 +198,7 @@ const AdminClasses = () => {
       )
     ) {
       try {
-        await axios.delete(
+        await api.delete(
           `/api/admin/classes/${id}`
         );
 
@@ -218,7 +218,7 @@ const AdminClasses = () => {
 
   const handleAddSubject = async (subjectId) => {
     try {
-      await axios.post(
+      await api.post(
         `/api/admin/classes/${selectedClass._id}/subjects`,
         {
           subjectId
@@ -231,7 +231,7 @@ const AdminClasses = () => {
 
       await fetchClasses();
 
-      const response = await axios.get(
+      const response = await api.get(
         '/api/admin/classes'
       );
 
@@ -263,7 +263,7 @@ const AdminClasses = () => {
       )
     ) {
       try {
-        await axios.delete(
+        await api.delete(
           `/api/admin/classes/${selectedClass._id}/subjects/${subjectId}`
         );
 
@@ -273,7 +273,7 @@ const AdminClasses = () => {
 
         await fetchClasses();
 
-        const response = await axios.get(
+        const response = await api.get(
           '/api/admin/classes'
         );
 

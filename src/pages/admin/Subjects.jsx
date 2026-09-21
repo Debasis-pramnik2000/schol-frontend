@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -20,7 +19,7 @@ import {
   FaUserTie,
   FaBook
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const AdminSubjects = () => {
@@ -51,14 +50,12 @@ const AdminSubjects = () => {
     fetchTeachers();
   }, []);
 
-  // ==================== FETCH SUBJECTS ====================
-
   const fetchSubjects = async () => {
     try {
       setLoading(true);
       setError('');
 
-      const response = await axios.get('/api/admin/subjects');
+      const response = await api.get('/api/admin/subjects');
 
       setSubjects(response.data.data || []);
     } catch (error) {
@@ -73,11 +70,9 @@ const AdminSubjects = () => {
     }
   };
 
-  // ==================== FETCH TEACHERS ====================
-
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get(
+      const response = await api.get(
         '/api/admin/teachers?limit=100'
       );
 
@@ -101,8 +96,6 @@ const AdminSubjects = () => {
     }
   };
 
-  // ==================== HANDLE INPUT ====================
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -111,8 +104,6 @@ const AdminSubjects = () => {
       [name]: value
     }));
   };
-
-  // ==================== SUBMIT ====================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -147,10 +138,7 @@ const AdminSubjects = () => {
         class: formData.class.trim(),
         section: formData.section || 'A',
         academicYear: formData.academicYear.trim(),
-
-        // Send User ID of teacher
         teacher: formData.teacher || undefined,
-
         totalMarks: Number(formData.totalMarks),
         passingMarks: Number(formData.passingMarks),
         theoryMarks: Number(formData.theoryMarks),
@@ -160,14 +148,14 @@ const AdminSubjects = () => {
       console.log('Subject payload:', payload);
 
       if (editingSubject) {
-        await axios.put(
+        await api.put(
           `/api/admin/subjects/${editingSubject._id}`,
           payload
         );
 
         toast.success('Subject updated successfully');
       } else {
-        await axios.post(
+        await api.post(
           '/api/admin/subjects',
           payload
         );
@@ -194,8 +182,6 @@ const AdminSubjects = () => {
     }
   };
 
-  // ==================== DELETE ====================
-
   const handleDelete = async (id) => {
     if (
       !window.confirm(
@@ -206,7 +192,7 @@ const AdminSubjects = () => {
     }
 
     try {
-      await axios.delete(
+      await api.delete(
         `/api/admin/subjects/${id}`
       );
 
@@ -229,8 +215,6 @@ const AdminSubjects = () => {
     }
   };
 
-  // ==================== RESET FORM ====================
-
   const resetForm = () => {
     setFormData({
       name: '',
@@ -250,14 +234,10 @@ const AdminSubjects = () => {
     setEditingSubject(null);
   };
 
-  // ==================== CREATE MODAL ====================
-
   const openCreateModal = () => {
     resetForm();
     setShowModal(true);
   };
-
-  // ==================== EDIT MODAL ====================
 
   const openEditModal = (subject) => {
     setEditingSubject(subject);
@@ -268,34 +248,25 @@ const AdminSubjects = () => {
       description: subject.description || '',
       class: subject.class || '',
       section: subject.section || 'A',
-
-      // Subject.teacher is populated User document
       teacher:
         subject.teacher?._id ||
         subject.teacher ||
         '',
-
       academicYear:
         subject.academicYear ||
         new Date().getFullYear().toString(),
-
       totalMarks:
         subject.totalMarks ?? 100,
-
       passingMarks:
         subject.passingMarks ?? 33,
-
       theoryMarks:
         subject.theoryMarks ?? 70,
-
       practicalMarks:
         subject.practicalMarks ?? 30
     });
 
     setShowModal(true);
   };
-
-  // ==================== LOADING ====================
 
   if (loading) {
     return (
@@ -309,8 +280,6 @@ const AdminSubjects = () => {
       </Container>
     );
   }
-
-  // ==================== UI ====================
 
   return (
     <Container fluid className="py-4">
@@ -524,8 +493,6 @@ const AdminSubjects = () => {
         </Col>
       </Row>
 
-      {/* ==================== ADD / EDIT MODAL ==================== */}
-
       <Modal
         show={showModal}
         onHide={() => {
@@ -548,8 +515,6 @@ const AdminSubjects = () => {
         <Form onSubmit={handleSubmit}>
 
           <Modal.Body>
-
-            {/* Subject Name + Code */}
 
             <Row>
 
@@ -600,8 +565,6 @@ const AdminSubjects = () => {
 
             </Row>
 
-            {/* Description */}
-
             <Form.Group className="mb-3">
 
               <Form.Label>
@@ -618,8 +581,6 @@ const AdminSubjects = () => {
               />
 
             </Form.Group>
-
-            {/* Class / Section / Academic Year */}
 
             <Row>
 
@@ -701,8 +662,6 @@ const AdminSubjects = () => {
 
             </Row>
 
-            {/* ==================== TEACHER ==================== */}
-
             <Form.Group className="mb-3">
 
               <Form.Label>
@@ -720,15 +679,6 @@ const AdminSubjects = () => {
                 </option>
 
                 {teachers.map((teacher) => {
-
-                  /*
-                   * IMPORTANT:
-                   * Teacher._id = Teacher document ID
-                   * Teacher.user._id = User document ID
-                   *
-                   * Subject.teacher references User.
-                   * Therefore we MUST send teacher.user._id.
-                   */
 
                   const userId =
                     teacher.user?._id;
@@ -759,8 +709,6 @@ const AdminSubjects = () => {
               )}
 
             </Form.Group>
-
-            {/* ==================== MARKS ==================== */}
 
             <Row>
 
@@ -904,4 +852,3 @@ const AdminSubjects = () => {
 };
 
 export default AdminSubjects;
-

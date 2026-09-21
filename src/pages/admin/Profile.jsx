@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Alert, Image, Badge } from 're
 import { useAuth } from '../../context/AuthContext';
 import ProfilePhotoUpload from '../../components/common/ProfilePhotoUpload';
 import { FaUser, FaEnvelope, FaPhone, FaUserCog } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const AdminProfile = () => {
@@ -30,7 +30,7 @@ const AdminProfile = () => {
     setSuccess('');
 
     try {
-      await axios.put('/api/admin/profile', formData);
+      await api.put('/api/admin/profile', formData);
       await updateProfile(formData);
       setSuccess('Profile updated successfully!');
       toast.success('Profile updated successfully!');
@@ -43,7 +43,6 @@ const AdminProfile = () => {
 
   const handlePhotoUpdate = (newPhoto) => {
     setProfilePhoto(newPhoto);
-    // Update user context
     if (newPhoto) {
       updateProfile({ ...formData, profilePicture: newPhoto });
     } else {
@@ -63,7 +62,6 @@ const AdminProfile = () => {
             </Alert>
           )}
 
-          {/* ✅ Profile Photo Upload */}
           <Card className="shadow-sm mb-4">
             <Card.Header className="fw-bold">
               <FaUserCog className="me-2" />
@@ -78,7 +76,6 @@ const AdminProfile = () => {
             </Card.Body>
           </Card>
 
-          {/* Profile Info Card */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <Row className="align-items-center">
@@ -114,7 +111,6 @@ const AdminProfile = () => {
             </Card.Body>
           </Card>
 
-          {/* Edit Profile Form */}
           <Card className="shadow-sm">
             <Card.Header className="fw-bold">Edit Profile</Card.Header>
             <Card.Body>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Spinner, Alert, Badge, Form, Modal } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaFilter } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -21,11 +21,10 @@ const AdminLeaves = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchLeaves(); // ✅ Fixed: Changed from fetchLeases to fetchLeaves
+    fetchLeaves();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
-  // ✅ Renamed function from fetchLeases to fetchLeaves
   const fetchLeaves = async () => {
     try {
       setLoading(true);
@@ -35,7 +34,7 @@ const AdminLeaves = () => {
       if (filters.month) params.append('month', filters.month);
       if (filters.year) params.append('year', filters.year);
 
-      const response = await axios.get(`/api/leave/all?${params}`);
+      const response = await api.get(`/api/leave/all?${params}`);
       setLeaves(response.data.data);
     } catch (error) {
       console.error('Error fetching leaves:', error);
@@ -51,7 +50,7 @@ const AdminLeaves = () => {
 
     setSubmitting(true);
     try {
-      await axios.put(`/api/leave/${selectedLeave._id}`, { 
+      await api.put(`/api/leave/${selectedLeave._id}`, { 
         status, 
         remarks: remarks || 'No remarks'
       });
@@ -106,7 +105,6 @@ const AdminLeaves = () => {
         <Col>
           <h2 className="mb-4">Leave Management</h2>
 
-          {/* Filters */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <Row>
@@ -174,7 +172,6 @@ const AdminLeaves = () => {
             </Card.Body>
           </Card>
 
-          {/* Leave List */}
           <Card className="shadow-sm">
             <Card.Body>
               {error && <Alert variant="danger">{error}</Alert>}
@@ -244,7 +241,6 @@ const AdminLeaves = () => {
         </Col>
       </Row>
 
-      {/* Action Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Process Leave Application</Modal.Title>

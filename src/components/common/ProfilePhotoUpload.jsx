@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button, Spinner, Alert, Image } from 'react-bootstrap';
-import { FaCamera, FaTrash} from 'react-icons/fa';
-import axios from 'axios';
+import { FaCamera, FaTrash } from 'react-icons/fa';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
@@ -14,14 +14,12 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
       setError('Please select a valid image file (JPEG, PNG, GIF, WEBP)');
       return;
     }
 
-    // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError('File size must be less than 5MB');
       return;
@@ -29,14 +27,12 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
 
     setError('');
     
-    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result);
     };
     reader.readAsDataURL(file);
 
-    // Upload the file
     uploadPhoto(file);
   };
 
@@ -48,7 +44,7 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
     formData.append('profilePhoto', file);
 
     try {
-      const response = await axios.post('/api/auth/upload-photo', formData, {
+      const response = await api.post('/api/auth/upload-photo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -77,7 +73,7 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
 
     setLoading(true);
     try {
-      const response = await axios.delete('/api/auth/remove-photo');
+      const response = await api.delete('/api/auth/remove-photo');
       if (response.data.success) {
         toast.success('Profile photo removed successfully');
         if (onPhotoUpdate) {
@@ -98,7 +94,6 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
 
   return (
     <div className="profile-photo-upload text-center">
-      {/* Photo Display */}
       <div className="photo-container mb-3">
         <Image
           src={preview || currentPhoto || 'https://via.placeholder.com/150'}
@@ -115,14 +110,12 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
         )}
       </div>
 
-      {/* Error Message */}
       {error && (
         <Alert variant="danger" className="mt-2">
           {error}
         </Alert>
       )}
 
-      {/* Hidden File Input */}
       <input
         type="file"
         ref={fileInputRef}
@@ -131,7 +124,6 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
         style={{ display: 'none' }}
       />
 
-      {/* Buttons */}
       <div className="d-flex gap-2 justify-content-center flex-wrap">
         <Button
           variant="primary"

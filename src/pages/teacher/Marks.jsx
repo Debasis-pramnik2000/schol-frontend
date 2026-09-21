@@ -3,7 +3,7 @@ import {
   Container, Row, Col, Card, Table, Form, Button, Spinner, Badge 
 } from 'react-bootstrap';
 import { FaPlus, FaSave } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const TeacherMarks = () => {
@@ -24,7 +24,7 @@ const TeacherMarks = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get('/api/teacher/classes');
+      const response = await api.get('/api/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -36,14 +36,13 @@ const TeacherMarks = () => {
   const fetchStudents = async (classId) => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/teacher/classes/${classId}/students`);
+      const response = await api.get(`/api/teacher/classes/${classId}/students`);
       const classInfo = response.data.data.class;
       const studentsList = response.data.data.students;
       
       setClassData(classInfo);
       setStudents(studentsList);
       
-      // Initialize marks data
       const initialMarks = studentsList.map(student => ({
         studentId: student._id,
         rollNumber: student.rollNumber,
@@ -99,7 +98,7 @@ const TeacherMarks = () => {
           grade: calculateGrade(parseInt(sub.marksObtained) || 0, sub.totalMarks)
         }));
 
-        return axios.post('/api/teacher/marks', {
+        return api.post('/api/teacher/marks', {
           studentId: student.studentId,
           class: classData.className,
           section: classData.section,
@@ -113,7 +112,6 @@ const TeacherMarks = () => {
       await Promise.all(promises);
       toast.success('Marks entered successfully!');
       
-      // Reset form
       setExamName('');
       fetchStudents(selectedClass);
     } catch (error) {

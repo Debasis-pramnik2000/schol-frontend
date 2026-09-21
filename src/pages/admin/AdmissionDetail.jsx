@@ -14,8 +14,8 @@ import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
-// ✅ Backend URL for images
-const BACKEND_URL = process.env.REACT_APP_API_URL?.replace('/api', '') || 'http://localhost:5000';
+// ✅ HARDCODED Backend URL for images
+const BACKEND_URL = 'https://scholl-backend-1.onrender.com';
 
 const AdminAdmissionDetail = () => {
   const { id } = useParams();
@@ -26,7 +26,6 @@ const AdminAdmissionDetail = () => {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Modals
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -34,7 +33,6 @@ const AdminAdmissionDetail = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [remarks, setRemarks] = useState('');
 
-  // ==================== FETCH ====================
   const fetchAdmission = useCallback(async () => {
     try {
       setLoading(true);
@@ -60,7 +58,6 @@ const AdminAdmissionDetail = () => {
     fetchAdmission();
   }, [fetchAdmission]);
 
-  // ✅ Get full image URL
   const getImageUrl = (path) => {
     if (!path) return null;
     
@@ -79,7 +76,6 @@ const AdminAdmissionDetail = () => {
     return `${BACKEND_URL}/${path}`;
   };
 
-  // ✅ Check file type from path
   const isImageFile = (path) => {
     if (!path) return false;
     let cleanPath = path.split('?')[0].split('#')[0];
@@ -95,7 +91,6 @@ const AdminAdmissionDetail = () => {
     return cleanPath.toLowerCase().endsWith('.pdf');
   };
 
-  // ==================== APPROVE ====================
   const handleApprove = async () => {
     setSubmitting(true);
     try {
@@ -132,7 +127,6 @@ const AdminAdmissionDetail = () => {
     }
   };
 
-  // ==================== REJECT ====================
   const handleReject = async () => {
     if (!remarks.trim()) {
       toast.warning('Please provide a reason for rejection');
@@ -154,7 +148,6 @@ const AdminAdmissionDetail = () => {
     }
   };
 
-  // ==================== DELETE ====================
   const handleDelete = async () => {
     setSubmitting(true);
     try {
@@ -169,7 +162,6 @@ const AdminAdmissionDetail = () => {
     }
   };
 
-  // ==================== HELPERS ====================
   const getStatusConfig = (status) => {
     const config = {
       'Pending': {
@@ -200,7 +192,6 @@ const AdminAdmissionDetail = () => {
     return config[status] || config['Pending'];
   };
 
-  // ✅ Open image modal
   const openImageModal = (imagePath, title) => {
     if (!imagePath) {
       toast.warning('No document available');
@@ -227,7 +218,6 @@ const AdminAdmissionDetail = () => {
     setShowImageModal(true);
   };
 
-  // ✅ Download document
   const downloadDocument = async (imagePath, filename) => {
     if (!imagePath) {
       toast.warning('No document available');
@@ -256,7 +246,6 @@ const AdminAdmissionDetail = () => {
     }
   };
 
-  // ==================== LOADING ====================
   if (loading) {
     return (
       <Container className="text-center py-5">
@@ -266,7 +255,6 @@ const AdminAdmissionDetail = () => {
     );
   }
 
-  // ==================== ERROR ====================
   if (error || !admission) {
     return (
       <Container className="py-5">
@@ -284,10 +272,8 @@ const AdminAdmissionDetail = () => {
 
   const statusConfig = getStatusConfig(admission.status);
 
-  // ==================== RENDER ====================
   return (
     <Container fluid className="py-4">
-      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
           <Link to="/admin/admissions" className="text-decoration-none">
@@ -325,7 +311,6 @@ const AdminAdmissionDetail = () => {
         </div>
       </div>
 
-      {/* Status Card */}
       <Card className="shadow-sm mb-4 border-0">
         <Card.Body className="text-center py-4">
           <div className={statusConfig.text}>{statusConfig.icon}</div>
@@ -342,14 +327,12 @@ const AdminAdmissionDetail = () => {
         </Card.Body>
       </Card>
 
-      {/* Admin Remarks */}
       {admission.remarks && (
         <Alert variant={admission.status === 'Approved' ? 'success' : 'danger'}>
           <strong>Admin Remarks:</strong> {admission.remarks}
         </Alert>
       )}
 
-      {/* Generated Credentials */}
       {admission.status === 'Approved' && admission.generatedUsername && (
         <Card className="shadow-sm mb-4 border-success">
           <Card.Header className="bg-success text-white">
@@ -392,9 +375,7 @@ const AdminAdmissionDetail = () => {
       )}
 
       <Row>
-        {/* ==================== LEFT COLUMN ==================== */}
         <Col lg={8}>
-          {/* Personal Information */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-primary text-white">
               <FaUser className="me-2" />
@@ -441,7 +422,6 @@ const AdminAdmissionDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Aadhaar Information */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-info text-white">
               <FaIdCard className="me-2" />
@@ -452,7 +432,6 @@ const AdminAdmissionDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Address */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-success text-white">
               <FaMapMarkerAlt className="me-2" />
@@ -478,7 +457,6 @@ const AdminAdmissionDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Class Information */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-warning text-dark">
               <FaGraduationCap className="me-2" />
@@ -496,7 +474,6 @@ const AdminAdmissionDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Education Information */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-secondary text-white">
               <FaGraduationCap className="me-2" />
@@ -526,9 +503,7 @@ const AdminAdmissionDetail = () => {
           </Card>
         </Col>
 
-        {/* ==================== RIGHT COLUMN ==================== */}
         <Col lg={4}>
-          {/* Application Info */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-dark text-white">
               <FaFileAlt className="me-2" />
@@ -558,7 +533,6 @@ const AdminAdmissionDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Documents */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Header className="bg-danger text-white">
               <FaFileAlt className="me-2" />
@@ -613,7 +587,6 @@ const AdminAdmissionDetail = () => {
             </Card.Body>
           </Card>
 
-          {/* Quick Actions */}
           {admission.status === 'Pending' && (
             <Card className="shadow-sm mb-4 border-warning">
               <Card.Header className="bg-warning text-dark">
@@ -634,7 +607,6 @@ const AdminAdmissionDetail = () => {
         </Col>
       </Row>
 
-      {/* ==================== APPROVE MODAL ==================== */}
       <Modal show={showApproveModal} onHide={() => setShowApproveModal(false)} centered>
         <Modal.Header closeButton className="bg-success text-white">
           <Modal.Title><FaCheckCircle className="me-2" /> Approve Admission</Modal.Title>
@@ -679,7 +651,6 @@ const AdminAdmissionDetail = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ==================== REJECT MODAL ==================== */}
       <Modal show={showRejectModal} onHide={() => setShowRejectModal(false)} centered>
         <Modal.Header closeButton className="bg-danger text-white">
           <Modal.Title><FaTimesCircle className="me-2" /> Reject Admission</Modal.Title>
@@ -717,7 +688,6 @@ const AdminAdmissionDetail = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ==================== DELETE MODAL ==================== */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton className="bg-secondary text-white">
           <Modal.Title><FaTrash className="me-2" /> Delete Admission</Modal.Title>
@@ -742,7 +712,6 @@ const AdminAdmissionDetail = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ==================== IMAGE PREVIEW MODAL ==================== */}
       <Modal 
         show={showImageModal} 
         onHide={() => setShowImageModal(false)}
@@ -855,7 +824,6 @@ const AdminAdmissionDetail = () => {
   );
 };
 
-// ==================== HELPER COMPONENTS ====================
 const InfoRow = ({ icon, label, value }) => (
   <div className="info-row mb-3">
     <small className="text-muted d-block mb-1">

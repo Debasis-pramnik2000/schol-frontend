@@ -21,7 +21,6 @@ const AdminAdmissions = () => {
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({});
   
-  // Filters
   const [filters, setFilters] = useState({
     status: '',
     class: '',
@@ -32,15 +31,12 @@ const AdminAdmissions = () => {
     sortOrder: 'desc'
   });
 
-  // Modals
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedAdmission, setSelectedAdmission] = useState(null);
   const [remarks, setRemarks] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
-  // Bulk selection
   const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => {
@@ -52,8 +48,6 @@ const AdminAdmissions = () => {
     fetchStats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ==================== FETCH DATA ====================
 
   const fetchAdmissions = async () => {
     try {
@@ -91,8 +85,6 @@ const AdminAdmissions = () => {
     }
   };
 
-  // ==================== HANDLERS ====================
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters(prev => ({
@@ -117,8 +109,6 @@ const AdminAdmissions = () => {
   const handlePageChange = (page) => {
     setFilters(prev => ({ ...prev, page }));
   };
-
-  // ==================== APPROVE ====================
 
   const openApproveModal = (admission) => {
     setSelectedAdmission(admission);
@@ -164,8 +154,6 @@ const AdminAdmissions = () => {
     }
   };
 
-  // ==================== REJECT ====================
-
   const openRejectModal = (admission) => {
     setSelectedAdmission(admission);
     setRemarks('');
@@ -201,8 +189,6 @@ const AdminAdmissions = () => {
     }
   };
 
-  // ==================== DELETE ====================
-
   const openDeleteModal = (admission) => {
     setSelectedAdmission(admission);
     setShowDeleteModal(true);
@@ -226,8 +212,6 @@ const AdminAdmissions = () => {
       setSubmitting(false);
     }
   };
-
-  // ==================== BULK APPROVE ====================
 
   const handleBulkApprove = async () => {
     if (selectedIds.length === 0) {
@@ -271,8 +255,6 @@ const AdminAdmissions = () => {
     );
   };
 
-  // ==================== EXPORT ====================
-
   const handleExport = async () => {
     try {
       const params = new URLSearchParams();
@@ -299,8 +281,6 @@ const AdminAdmissions = () => {
     }
   };
 
-  // ==================== HELPERS ====================
-
   const getStatusBadge = (status) => {
     const config = {
       'Pending': { bg: 'warning', icon: <FaClock className="me-1" /> },
@@ -316,13 +296,10 @@ const AdminAdmissions = () => {
     );
   };
 
-  // ==================== RENDER ====================
-
   return (
     <Container fluid className="py-4">
       <Row>
         <Col>
-          {/* Header */}
           <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <div>
               <h2 className="mb-1">
@@ -359,7 +336,6 @@ const AdminAdmissions = () => {
             </div>
           </div>
 
-          {/* Statistics Cards */}
           <Row className="mb-4">
             <Col lg={3} md={6} className="mb-3">
               <Card className="stat-card stat-total border-0 shadow-sm">
@@ -423,7 +399,6 @@ const AdminAdmissions = () => {
             </Col>
           </Row>
 
-          {/* Filters */}
           <Card className="shadow-sm mb-4 border-0">
             <Card.Body>
               <Row className="g-3">
@@ -492,7 +467,6 @@ const AdminAdmissions = () => {
             </Card.Body>
           </Card>
 
-          {/* Admissions Table */}
           <Card className="shadow-sm border-0">
             <Card.Body className="p-0">
               {error && (
@@ -616,7 +590,6 @@ const AdminAdmissions = () => {
                     </Table>
                   </div>
 
-                  {/* Pagination */}
                   {pagination.pages > 1 && (
                     <div className="d-flex justify-content-between align-items-center p-3 border-top">
                       <small className="text-muted">
@@ -674,7 +647,6 @@ const AdminAdmissions = () => {
         </Col>
       </Row>
 
-      {/* ==================== APPROVE MODAL ==================== */}
       <Modal show={showApproveModal} onHide={() => setShowApproveModal(false)} centered>
         <Modal.Header closeButton className="bg-success text-white">
           <Modal.Title>
@@ -739,7 +711,6 @@ const AdminAdmissions = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ==================== REJECT MODAL ==================== */}
       <Modal show={showRejectModal} onHide={() => setShowRejectModal(false)} centered>
         <Modal.Header closeButton className="bg-danger text-white">
           <Modal.Title>
@@ -795,7 +766,6 @@ const AdminAdmissions = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* ==================== DELETE MODAL ==================== */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton className="bg-secondary text-white">
           <Modal.Title>

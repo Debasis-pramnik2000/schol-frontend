@@ -4,7 +4,7 @@ import {
   Spinner, Alert, Badge 
 } from 'react-bootstrap';
 import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -20,7 +20,8 @@ const AdminNotices = () => {
     targetRoles: ['student', 'teacher', 'admin'],
     priority: 'Medium',
     expiresAt: '',
-    attachments: []
+    attachments: [],
+    isPublic: false
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -31,7 +32,7 @@ const AdminNotices = () => {
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/admin/notices');
+      const response = await api.get('/api/admin/notices');
       setNotices(response.data.data);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -63,10 +64,10 @@ const AdminNotices = () => {
 
     try {
       if (editingNotice) {
-        await axios.put(`/api/admin/notices/${editingNotice._id}`, formData);
+        await api.put(`/api/admin/notices/${editingNotice._id}`, formData);
         toast.success('Notice updated successfully');
       } else {
-        await axios.post('/api/admin/notices', formData);
+        await api.post('/api/admin/notices', formData);
         toast.success('Notice created successfully');
       }
       setShowModal(false);
@@ -82,7 +83,7 @@ const AdminNotices = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this notice?')) {
       try {
-        await axios.delete(`/api/admin/notices/${id}`);
+        await api.delete(`/api/admin/notices/${id}`);
         toast.success('Notice deleted successfully');
         fetchNotices();
       } catch (error) {
@@ -98,7 +99,8 @@ const AdminNotices = () => {
       targetRoles: ['student', 'teacher', 'admin'],
       priority: 'Medium',
       expiresAt: '',
-      attachments: []
+      attachments: [],
+      isPublic: false
     });
     setEditingNotice(null);
   };
@@ -116,7 +118,8 @@ const AdminNotices = () => {
       targetRoles: notice.targetRoles,
       priority: notice.priority,
       expiresAt: notice.expiresAt ? notice.expiresAt.split('T')[0] : '',
-      attachments: notice.attachments || []
+      attachments: notice.attachments || [],
+      isPublic: notice.isPublic || false
     });
     setShowModal(true);
   };
@@ -164,6 +167,7 @@ const AdminNotices = () => {
                       <th>Content</th>
                       <th>Target</th>
                       <th>Priority</th>
+                      <th>Public</th>
                       <th>Posted By</th>
                       <th>Date</th>
                       <th>Status</th>
@@ -192,6 +196,11 @@ const AdminNotices = () => {
                         <td>
                           <Badge bg={getPriorityColor(notice.priority)}>
                             {notice.priority}
+                          </Badge>
+                        </td>
+                        <td>
+                          <Badge bg={notice.isPublic ? 'success' : 'secondary'}>
+                            {notice.isPublic ? 'Yes' : 'No'}
                           </Badge>
                         </td>
                         <td>{notice.author?.name || 'Unknown'}</td>
@@ -229,7 +238,6 @@ const AdminNotices = () => {
         </Col>
       </Row>
 
-      {/* Add/Edit Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
@@ -260,17 +268,19 @@ const AdminNotices = () => {
                 required
               />
             </Form.Group>
-<Form.Group className="mb-3">
-  <Form.Check
-    type="checkbox"
-    label="Show this notice on Home Page (Public)"
-    checked={formData.isPublic}
-    onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
-  />
-  <Form.Text className="text-muted">
-    If checked, this notice will be visible on the home page for everyone
-  </Form.Text>
-</Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Show this notice on Home Page (Public)"
+                checked={formData.isPublic}
+                onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })}
+              />
+              <Form.Text className="text-muted">
+                If checked, this notice will be visible on the home page for everyone
+              </Form.Text>
+            </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Target Audience</Form.Label>
               <div className="d-flex gap-3">

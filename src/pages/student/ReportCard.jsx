@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Table, Badge } from 'react-bootstrap';
-import {  FaFilePdf, FaFileExcel, FaPrint } from 'react-icons/fa';
-import axios from 'axios';
+import { FaFilePdf, FaFileExcel, FaPrint } from 'react-icons/fa';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 
@@ -19,7 +19,7 @@ const StudentReportCard = () => {
 
   const fetchStudentData = async () => {
     try {
-      const response = await axios.get('/api/auth/me');
+      const response = await api.get('/api/auth/me');
       setStudentId(response.data.user.id);
       fetchResults();
     } catch (error) {
@@ -31,7 +31,7 @@ const StudentReportCard = () => {
   const fetchResults = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/student/results');
+      const response = await api.get('/api/student/results');
       setResults(response.data.data);
     } catch (error) {
       console.error('Error fetching results:', error);
@@ -45,7 +45,7 @@ const StudentReportCard = () => {
     if (!studentId) return;
     setDownloading(true);
     try {
-      const response = await axios.get(`/api/student/report-card/${studentId}`, {
+      const response = await api.get(`/api/student/report-card/${studentId}`, {
         responseType: 'blob'
       });
       
@@ -70,7 +70,7 @@ const StudentReportCard = () => {
     if (!studentId) return;
     setDownloading(true);
     try {
-      const response = await axios.get(`/api/student/report-card/excel/${studentId}`, {
+      const response = await api.get(`/api/student/report-card/excel/${studentId}`, {
         responseType: 'blob'
       });
       

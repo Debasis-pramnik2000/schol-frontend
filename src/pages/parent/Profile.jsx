@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button, Alert, Image, Badge } from 're
 import { useAuth } from '../../context/AuthContext';
 import ProfilePhotoUpload from '../../components/common/ProfilePhotoUpload';
 import { FaUser, FaEnvelope, FaPhone, FaUserFriends } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const ParentProfile = () => {
@@ -33,7 +33,7 @@ const ParentProfile = () => {
     setSuccess('');
 
     try {
-      await axios.put('/api/parent/profile', formData);
+      await api.put('/api/parent/profile', formData);
       await updateProfile(formData);
       setSuccess('Profile updated successfully!');
       toast.success('Profile updated successfully!');
@@ -65,7 +65,6 @@ const ParentProfile = () => {
             </Alert>
           )}
 
-          {/* Profile Photo Upload */}
           <Card className="shadow-sm mb-4">
             <Card.Header className="fw-bold">
               <FaUserFriends className="me-2" />
@@ -80,7 +79,6 @@ const ParentProfile = () => {
             </Card.Body>
           </Card>
 
-          {/* Profile Info Card */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
               <Row className="align-items-center">
@@ -119,7 +117,6 @@ const ParentProfile = () => {
             </Card.Body>
           </Card>
 
-          {/* Edit Profile Form */}
           <Card className="shadow-sm">
             <Card.Header className="fw-bold">Edit Profile</Card.Header>
             <Card.Body>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Spinner,} from 'react-bootstrap';
+import { Container, Row, Col, Card, Badge, Spinner } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { 
-  
   FaCalendarCheck, 
   FaBook, 
   FaChartLine,
@@ -23,7 +22,7 @@ const StudentDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await axios.get('/api/student/dashboard');
+      const response = await api.get('/api/student/dashboard');
       setDashboardData(response.data.data);
     } catch (error) {
       console.error('Error fetching dashboard:', error);
@@ -50,11 +49,10 @@ const StudentDashboard = () => {
     );
   }
 
-  const { student, attendance, timetable,} = dashboardData;
+  const { student, attendance, timetable } = dashboardData;
 
   return (
     <Container fluid className="py-4">
-      {/* Welcome Section */}
       <Row className="mb-4">
         <Col>
           <div className="bg-primary text-white p-4 rounded-3">
@@ -66,7 +64,6 @@ const StudentDashboard = () => {
         </Col>
       </Row>
 
-      {/* Statistics Cards */}
       <Row className="mb-4">
         <Col md={3} sm={6}>
           <Card className="shadow-sm border-0">
@@ -121,9 +118,6 @@ const StudentDashboard = () => {
           </Link>
         </Col>
       </Row>
-
-      {/* Rest of your dashboard code remains same */}
-      {/* Timetable and Notices sections... */}
     </Container>
   );
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Badge, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaUsers, FaCalendarCheck, FaChartLine, FaBell } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import moment from 'moment';
 
@@ -19,7 +19,7 @@ const ParentDashboard = () => {
 
   const fetchDashboard = async () => {
     try {
-      const response = await axios.get('/api/parent/dashboard');
+      const response = await api.get('/api/parent/dashboard');
       setDashboardData(response.data.data);
     } catch (error) {
       console.error('Error fetching dashboard:', error);
@@ -50,7 +50,6 @@ const ParentDashboard = () => {
 
   return (
     <Container fluid className="py-4">
-      {/* Welcome Section */}
       <Row className="mb-4">
         <Col>
           <div className="bg-success text-white p-4 rounded-3">
@@ -62,7 +61,6 @@ const ParentDashboard = () => {
         </Col>
       </Row>
 
-      {/* Statistics */}
       <Row className="mb-4">
         <Col md={4}>
           <Card className="text-center shadow-sm">
@@ -93,7 +91,6 @@ const ParentDashboard = () => {
         </Col>
       </Row>
 
-      {/* Children List */}
       <Row className="mb-4">
         <Col>
           <h4 className="mb-3">My Children</h4>
@@ -118,7 +115,6 @@ const ParentDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Attendance Summary */}
                     <div className="d-flex justify-content-between mb-2">
                       <span className="text-muted">Attendance:</span>
                       <Badge bg={child.attendance?.percentage >= 75 ? 'success' : 'warning'}>
@@ -153,7 +149,6 @@ const ParentDashboard = () => {
         </Col>
       </Row>
 
-      {/* Recent Notices */}
       <Row>
         <Col>
           <Card className="shadow-sm">
