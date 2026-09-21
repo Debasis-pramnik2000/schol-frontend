@@ -8,7 +8,7 @@ import {
   FaGraduationCap, FaCamera, FaFileUpload, FaCheckCircle,
   FaSchool, FaUserPlus, FaClipboardList
 } from 'react-icons/fa';
-import api from '../../services/api';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 
 const OnlineAdmission = () => {
