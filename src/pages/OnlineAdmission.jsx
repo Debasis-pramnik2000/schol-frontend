@@ -256,7 +256,7 @@ const OnlineAdmission = () => {
       }
 
       // ✅ Submit to API
-      const response = await api.post('/api/admission/apply', submitData, {
+      const response = await api.post('/admission/apply', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
