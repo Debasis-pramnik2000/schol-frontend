@@ -9,7 +9,7 @@ import {
   FaBell
 } from 'react-icons/fa';
 import { XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import axios from 'axios';
+import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
@@ -27,7 +27,7 @@ const AdminDashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await axios.get('/api/admin/dashboard');
+      const response = await api.get('/api/admin/dashboard');
       setStats(response.data.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -50,6 +50,14 @@ const AdminDashboard = () => {
     return (
       <Container className="py-5">
         <div className="alert alert-danger">{error}</div>
+      </Container>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <Container className="py-5">
+        <div className="alert alert-warning">No dashboard data available</div>
       </Container>
     );
   }
@@ -131,7 +139,7 @@ const AdminDashboard = () => {
             </Card.Header>
             <Card.Body>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.monthlyAttendance}>
+                <BarChart data={stats.monthlyAttendance || []}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="_id" />
                   <YAxis />
@@ -153,7 +161,7 @@ const AdminDashboard = () => {
               <Link to="/admin/students" className="text-decoration-none">View All</Link>
             </Card.Header>
             <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
-              {stats.recentStudents.map((student, index) => (
+              {(stats.recentStudents || []).map((student, index) => (
                 <div key={index} className="d-flex align-items-center border-bottom py-2">
                   <img 
                     src={student.user?.profilePicture || 'https://via.placeholder.com/40'} 
@@ -180,7 +188,7 @@ const AdminDashboard = () => {
               <Link to="/admin/notices" className="text-decoration-none">View All</Link>
             </Card.Header>
             <Card.Body style={{ maxHeight: '200px', overflowY: 'auto' }}>
-              {stats.recentNotices.map((notice, index) => (
+              {(stats.recentNotices || []).map((notice, index) => (
                 <div key={index} className="border-bottom py-2">
                   <div className="d-flex justify-content-between">
                     <span className="fw-bold">{notice.title}</span>
