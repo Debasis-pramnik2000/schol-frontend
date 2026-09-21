@@ -8,7 +8,7 @@ import {
   FaGraduationCap, FaCamera, FaFileUpload, FaCheckCircle,
   FaSchool, FaUserPlus, FaClipboardList
 } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 
 const OnlineAdmission = () => {
@@ -256,11 +256,11 @@ const OnlineAdmission = () => {
       }
 
       // ✅ Submit to API
-      const response = await axios.post('/api/admission/apply', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await api.post('/api/admission/apply', submitData, {
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+});
 
       if (response.data.success) {
         setApplicationNumber(response.data.data.applicationNumber);
