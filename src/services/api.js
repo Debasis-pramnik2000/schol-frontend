@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// ✅ HARDCODED Backend URL - Render
 const API_URL = 'https://scholl-backend-1.onrender.com';
 
 const api = axios.create({
@@ -30,7 +31,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
