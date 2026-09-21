@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
@@ -9,8 +10,10 @@ const Login = () => {
     username: '',
     password: ''
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -19,6 +22,7 @@ const Login = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+
     setError('');
   };
 
@@ -33,8 +37,11 @@ const Login = () => {
       return;
     }
 
-    const result = await login(formData.username, formData.password);
-    
+    const result = await login(
+      formData.username,
+      formData.password
+    );
+
     if (result.success) {
       if (result.user.role === 'student') {
         navigate('/student/dashboard');
@@ -42,32 +49,37 @@ const Login = () => {
         navigate('/teacher/dashboard');
       } else if (result.user.role === 'admin') {
         navigate('/admin/dashboard');
-      }else if (result.user.role === 'parent') {
-  navigate('/parent/dashboard');  // ✅ Parent redirect
+      } else if (result.user.role === 'parent') {
+        navigate('/parent/dashboard');
       }
     } else {
       setError(result.message || 'Login failed. Please try again.');
     }
-    
+
     setLoading(false);
   };
 
   return (
-    <div className="login-page" style={{ 
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      padding: '20px 0'
-    }}>
+    <div
+      className="login-page"
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '20px 0'
+      }}
+    >
       <Container>
         <Row className="justify-content-center">
           <Col md={6} lg={5}>
-            {/* Back to Home Link */}
-            <Link to="/" className="text-white text-decoration-none mb-3 d-inline-block">
+            <Link
+              to="/"
+              className="text-white text-decoration-none mb-3 d-inline-block"
+            >
               <FaArrowLeft className="me-1" /> Back to Home
             </Link>
-            
+
             <Card className="shadow-lg border-0">
               <Card.Body className="p-5">
                 <div className="text-center mb-4">
@@ -87,6 +99,7 @@ const Login = () => {
                       <FaUser className="me-2" />
                       Username
                     </Form.Label>
+
                     <Form.Control
                       type="text"
                       name="username"
@@ -103,6 +116,7 @@ const Login = () => {
                       <FaLock className="me-2" />
                       Password
                     </Form.Label>
+
                     <Form.Control
                       type="password"
                       name="password"
@@ -115,9 +129,9 @@ const Login = () => {
                   </Form.Group>
 
                   <div className="d-grid">
-                    <Button 
-                      variant="primary" 
-                      type="submit" 
+                    <Button
+                      variant="primary"
+                      type="submit"
                       size="lg"
                       disabled={loading}
                     >
@@ -133,9 +147,9 @@ const Login = () => {
                 </Form>
 
                 <hr className="my-4" />
+
                 <div className="text-center">
-                  <small className="text-muted">
-                  </small>
+                  <small className="text-muted"></small>
                 </div>
               </Card.Body>
             </Card>

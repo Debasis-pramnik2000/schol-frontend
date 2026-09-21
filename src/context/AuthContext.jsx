@@ -1,14 +1,24 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import axios from 'axios';
+
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback
+} from 'react';
+
+import api from '../utils/api';
 import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider');
   }
+
   return context;
 };
 
@@ -17,22 +27,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  // ✅ Set axios default header
+  // Set token for API requests
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
-      delete axios.defaults.headers.common['Authorization'];
+      delete api.defaults.headers.common['Authorization'];
     }
   }, [token]);
 
-  // ✅ Load user (memoized)
+  // Load user
   const loadUser = useCallback(async () => {
     try {
-      const response = await axios.get('/api/auth/me');
+      const response = await api.get('/api/auth/me');
       setUser(response.data.user);
     } catch (error) {
       console.error('Load user error:', error);
+
       localStorage.removeItem('token');
       setToken(null);
       setUser(null);
@@ -41,7 +52,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // ✅ Load user on mount
+  // Load user on mount
   useEffect(() => {
     if (token) {
       loadUser();
@@ -50,54 +61,99 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token, loadUser]);
 
+  // Login
   const login = async (username, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { username, password });
+      const response = await api.post('/api/auth/login', {
+        username,
+        password
+      });
+
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-      
+
       toast.success(`Welcome back, ${user.name}!`);
-      return { success: true, user };
+
+      return {
+        success: true,
+        user
+      };
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
+      const message =
+        error.response?.data?.message || 'Login failed';
+
       toast.error(message);
-      return { success: false, message };
+
+      return {
+        success: false,
+        message
+      };
     }
   };
 
+  // Logout
   const logout = () => {
     localStorage.removeItem('token');
+
     setToken(null);
     setUser(null);
-    delete axios.defaults.headers.common['Authorization'];
+
+    delete api.defaults.headers.common['Authorization'];
+
     toast.info('Logged out successfully');
   };
 
+  // Update profile
   const updateProfile = async (formData) => {
     try {
-      const response = await axios.put('/api/auth/profile', formData);
+      const response = await api.put('/api/auth/profile', formData);
+
       setUser(response.data.user);
+
       toast.success('Profile updated successfully');
-      return { success: true };
+
+      return {
+        success: true
+      };
     } catch (error) {
-      const message = error.response?.data?.message || 'Profile update failed';
+      const message =
+        error.response?.data?.message || 'Profile update failed';
+
       toast.error(message);
-      return { success: false, message };
+
+      return {
+        success: false,
+        message
+      };
     }
   };
 
+  // Change password
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put('/api/auth/change-password', { currentPassword, newPassword });
+      await api.put('/api/auth/change-password', {
+        currentPassword,
+        newPassword
+      });
+
       toast.success('Password changed successfully');
-      return { success: true };
+
+      return {
+        success: true
+      };
     } catch (error) {
-      const message = error.response?.data?.message || 'Password change failed';
+      const message =
+        error.response?.data?.message || 'Password change failed';
+
       toast.error(message);
-      return { success: false, message };
+
+      return {
+        success: false,
+        message
+      };
     }
   };
 
