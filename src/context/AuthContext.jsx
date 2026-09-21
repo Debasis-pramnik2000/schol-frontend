@@ -7,7 +7,7 @@ import React, {
   useCallback
 } from 'react';
 
-import api from '../utils/api';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
