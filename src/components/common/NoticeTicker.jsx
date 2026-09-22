@@ -29,6 +29,7 @@ const NoticeTicker = () => {
     try {
       setLoading(true);
       setError('');
+
       const response = await api.get('/api/public/notices');
       setNotices(response.data.data || []);
     } catch (error) {
@@ -41,7 +42,10 @@ const NoticeTicker = () => {
 
   const handleNoticeClick = async (notice) => {
     try {
-      const response = await api.get(`/api/public/notices/${notice._id}`);
+      const response = await api.get(
+        `/api/public/notices/${notice._id}`
+      );
+
       setSelectedNotice(response.data.data);
       setShowModal(true);
     } catch (error) {
@@ -61,11 +65,16 @@ const NoticeTicker = () => {
         }
       );
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const url = window.URL.createObjectURL(
+        new Blob([response.data])
+      );
 
+      const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `notice-${noticeId}.pdf`);
+      link.setAttribute(
+        'download',
+        `notice-${noticeId}.pdf`
+      );
 
       document.body.appendChild(link);
       link.click();
@@ -95,7 +104,8 @@ const NoticeTicker = () => {
 
   const isNewNotice = (createdAt) => {
     const hoursDiff =
-      (new Date() - new Date(createdAt)) / (1000 * 60 * 60);
+      (new Date() - new Date(createdAt)) /
+      (1000 * 60 * 60);
 
     return hoursDiff < 24;
   };
@@ -120,7 +130,8 @@ const NoticeTicker = () => {
     return (
       <Card className="notice-ticker-card shadow-sm">
         <Card.Header className="bg-primary text-white">
-          <FaBell className="me-2" /> Notices
+          <FaBell className="me-2" />
+          Notices
         </Card.Header>
 
         <Card.Body className="text-center py-4">
@@ -142,7 +153,8 @@ const NoticeTicker = () => {
     return (
       <Card className="notice-ticker-card shadow-sm">
         <Card.Header className="bg-primary text-white">
-          <FaBell className="me-2" /> Notices
+          <FaBell className="me-2" />
+          Notices
         </Card.Header>
 
         <Card.Body className="text-center py-4">
@@ -177,12 +189,8 @@ const NoticeTicker = () => {
             position: 'relative'
           }}
         >
-          <div
-            className="notice-ticker-scroll"
-            style={{
-              animation: 'noticeScroll 25s linear infinite'
-            }}
-          >
+          <div className="notice-ticker-track">
+
             {[...notices, ...notices].map((notice, index) => (
               <div
                 key={`${notice._id}-${index}`}
@@ -240,24 +248,41 @@ const NoticeTicker = () => {
                 </div>
               </div>
             ))}
+
           </div>
         </Card.Body>
       </Card>
 
       <style>
         {`
-          @keyframes noticeScroll {
-            0% {
+          .notice-ticker-body {
+            overflow: hidden !important;
+            position: relative;
+          }
+
+          .notice-ticker-track {
+            display: flex;
+            flex-direction: column;
+            animation: noticeScrollUp 30s linear infinite;
+            will-change: transform;
+          }
+
+          .notice-ticker-track:hover {
+            animation-play-state: paused;
+          }
+
+          .notice-ticker-item {
+            flex-shrink: 0;
+          }
+
+          @keyframes noticeScrollUp {
+            from {
               transform: translateY(0);
             }
 
-            100% {
+            to {
               transform: translateY(-50%);
             }
-          }
-
-          .notice-ticker-scroll:hover {
-            animation-play-state: paused;
           }
 
           .new-badge {
@@ -267,20 +292,28 @@ const NoticeTicker = () => {
 
           .blink {
             color: #dc3545;
-            font-weight: bold;
-            animation: newBlink 1s infinite;
+            font-weight: 700;
+            animation: newNoticeBlink 1s infinite;
           }
 
-          @keyframes newBlink {
+          @keyframes newNoticeBlink {
             0%,
-            50%,
             100% {
               opacity: 1;
             }
 
-            25%,
-            75% {
+            50% {
               opacity: 0;
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .notice-ticker-track {
+              animation: none;
+            }
+
+            .blink {
+              animation: none;
             }
           }
         `}
@@ -363,6 +396,7 @@ const NoticeTicker = () => {
               <hr />
 
               <div className="notice-full-content mb-3">
+
                 <p
                   style={{
                     whiteSpace: 'pre-wrap',
@@ -372,6 +406,7 @@ const NoticeTicker = () => {
                 >
                   {selectedNotice.content}
                 </p>
+
               </div>
 
               {selectedNotice.attachments &&
@@ -440,4 +475,3 @@ const NoticeTicker = () => {
 };
 
 export default NoticeTicker;
-
