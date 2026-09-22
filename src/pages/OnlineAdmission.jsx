@@ -291,7 +291,7 @@ const OnlineAdmission = () => {
       display: "inline-flex",
       alignItems: "center",
       gap: "6px",
-      fontWeight: "600"
+      color:"blue"
     }}
   >
     <FaHome /> Back to Home
