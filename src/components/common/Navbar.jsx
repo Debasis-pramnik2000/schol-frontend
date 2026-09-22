@@ -32,33 +32,49 @@ const NavigationBar = () => {
         {/* Navigation */}
         <Nav className="navbar-menu">
 
-          {/* Home */}
+          {/* Home - Visible on mobile + desktop */}
           <Nav.Link as={Link} to="/" className="fw-bold nav-item-custom">
             <FaHome className="nav-icon" />
             <span>Home</span>
           </Nav.Link>
 
-          {/* About - Desktop Only */}
-          <Nav.Link as={Link} to="/about" className="fw-bold nav-item-custom desktop-only">
+          {/* About - Desktop ONLY */}
+          <Nav.Link
+            as={Link}
+            to="/about"
+            className="fw-bold nav-item-custom desktop-only"
+          >
             <FaInfoCircle className="nav-icon" />
             <span>About</span>
           </Nav.Link>
 
-          {/* Apply Online - Desktop Only */}
-          <Nav.Link as={Link} to="/apply-online" className="fw-bold nav-item-custom desktop-only">
+          {/* Apply Online - Desktop ONLY */}
+          <Nav.Link
+            as={Link}
+            to="/apply-online"
+            className="fw-bold nav-item-custom desktop-only"
+          >
             <FaUserPlus className="nav-icon" />
             <span>Apply Online admission</span>
           </Nav.Link>
 
-          {/* Check Status */}
-          <Nav.Link as={Link} to="/application-status" className="fw-bold nav-item-custom">
+          {/* Check Status - Visible on mobile + desktop */}
+          <Nav.Link
+            as={Link}
+            to="/application-status"
+            className="fw-bold nav-item-custom"
+          >
             <FaSearch className="nav-icon" />
             <span>Check Status</span>
           </Nav.Link>
 
-          {/* Login */}
+          {/* Login - Visible on mobile + desktop (only if not authenticated) */}
           {!isAuthenticated && (
-            <Nav.Link as={Link} to="/login" className="fw-bold nav-item-custom">
+            <Nav.Link
+              as={Link}
+              to="/login"
+              className="fw-bold nav-item-custom"
+            >
               <FaUser className="nav-icon" />
               <span>Login</span>
             </Nav.Link>
