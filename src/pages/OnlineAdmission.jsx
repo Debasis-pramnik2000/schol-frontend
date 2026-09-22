@@ -281,23 +281,22 @@ const OnlineAdmission = () => {
                 ABC School - Session 2024-2025
               </p>
             </Col>
-            <Col md={4} className="text-md-end mt-3 mt-md-0">
-              <Link
-                to="/"
-                className="btn btn-outline-light"
-                style={{
-                  position: "fixed",
-                  right: "20px",
-                  top: "20px",
-                  zIndex: 9999,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px"
-                }}
-              >
-                <FaHome /> Back to Home
-              </Link>
-            </Col>
+           <Col md={4} className="text-md-end mt-3 mt-md-0">
+  <Link
+    to="/"
+    className="btn btn-light"
+    style={{
+      position: "relative",
+      zIndex: 10,
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "6px",
+      fontWeight: "600"
+    }}
+  >
+    <FaHome /> Back to Home
+  </Link>
+</Col>
           </Row>
         </Container>
       </div>
