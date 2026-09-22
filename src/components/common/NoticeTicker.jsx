@@ -20,38 +20,17 @@ const NoticeTicker = () => {
   const [selectedNotice, setSelectedNotice] = useState(null);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     fetchNotices();
   }, []);
 
-  // Automatically move notices upward one by one
-  useEffect(() => {
-    if (notices.length <= 1 || isPaused) return;
-
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        if (prevIndex >= notices.length - 1) {
-          return 0;
-        }
-        return prevIndex + 1;
-      });
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [notices.length, isPaused]);
-
   const fetchNotices = async () => {
     try {
       setLoading(true);
       setError('');
-
       const response = await api.get('/api/public/notices');
-
       setNotices(response.data.data || []);
-      setCurrentIndex(0);
     } catch (error) {
       console.error('Error fetching notices:', error);
       setError('Failed to load notices');
@@ -61,23 +40,14 @@ const NoticeTicker = () => {
   };
 
   const handleNoticeClick = async (notice) => {
-    // Stop automatic movement when user clicks a notice
-    setIsPaused(true);
-
     try {
       const response = await api.get(`/api/public/notices/${notice._id}`);
-
       setSelectedNotice(response.data.data);
       setShowModal(true);
     } catch (error) {
       console.error('Error fetching notice:', error);
       toast.error('Failed to load notice');
     }
-  };
-
-  const handleModalClose = () => {
-    setShowModal(false);
-    setIsPaused(false);
   };
 
   const downloadPDF = async (noticeId) => {
@@ -91,11 +61,9 @@ const NoticeTicker = () => {
         }
       );
 
-      const url = window.URL.createObjectURL(
-        new Blob([response.data])
-      );
-
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
+
       link.href = url;
       link.setAttribute('download', `notice-${noticeId}.pdf`);
 
@@ -127,8 +95,7 @@ const NoticeTicker = () => {
 
   const isNewNotice = (createdAt) => {
     const hoursDiff =
-      (new Date() - new Date(createdAt)) /
-      (1000 * 60 * 60);
+      (new Date() - new Date(createdAt)) / (1000 * 60 * 60);
 
     return hoursDiff < 24;
   };
@@ -153,8 +120,7 @@ const NoticeTicker = () => {
     return (
       <Card className="notice-ticker-card shadow-sm">
         <Card.Header className="bg-primary text-white">
-          <FaBell className="me-2" />
-          Notices
+          <FaBell className="me-2" /> Notices
         </Card.Header>
 
         <Card.Body className="text-center py-4">
@@ -164,7 +130,7 @@ const NoticeTicker = () => {
             variant="primary"
           />
 
-          <p className="mt-2 text-muted small mb-0">
+          <p className="mt-2 text-muted small">
             Loading notices...
           </p>
         </Card.Body>
@@ -176,8 +142,7 @@ const NoticeTicker = () => {
     return (
       <Card className="notice-ticker-card shadow-sm">
         <Card.Header className="bg-primary text-white">
-          <FaBell className="me-2" />
-          Notices
+          <FaBell className="me-2" /> Notices
         </Card.Header>
 
         <Card.Body className="text-center py-4">
@@ -191,77 +156,6 @@ const NoticeTicker = () => {
 
   return (
     <>
-      <style>
-        {`
-          .notice-scroll-container {
-            height: 170px;
-            overflow: hidden;
-            position: relative;
-          }
-
-          .notice-scroll-track {
-            transition: transform 0.8s ease-in-out;
-          }
-
-          .notice-ticker-item {
-            min-height: 170px;
-            box-sizing: border-box;
-            background: #fff;
-          }
-
-          .notice-ticker-item:hover {
-            background: #f8f9fa;
-          }
-
-          .new-badge {
-            display: inline-flex;
-            align-items: center;
-            background: #dc3545;
-            color: white;
-            padding: 2px 7px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-          }
-
-          .blink {
-            animation: noticeBlink 1s infinite;
-          }
-
-          @keyframes noticeBlink {
-            0% {
-              opacity: 1;
-            }
-
-            50% {
-              opacity: 0.15;
-            }
-
-            100% {
-              opacity: 1;
-            }
-          }
-
-          .notice-title {
-            font-weight: 600;
-          }
-
-          .notice-content {
-            line-height: 1.5;
-          }
-
-          @media (max-width: 576px) {
-            .notice-scroll-container {
-              height: 180px;
-            }
-
-            .notice-ticker-item {
-              min-height: 180px;
-            }
-          }
-        `}
-      </style>
-
       <Card className="notice-ticker-card shadow-sm">
 
         <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
@@ -275,26 +169,32 @@ const NoticeTicker = () => {
           </Badge>
         </Card.Header>
 
-        <Card.Body className="p-0">
+        <Card.Body
+          className="p-0 notice-ticker-body"
+          style={{
+            height: '350px',
+            overflow: 'hidden',
+            position: 'relative'
+          }}
+        >
+          <div
+            className="notice-ticker-scroll"
+            style={{
+              animation: 'noticeScroll 25s linear infinite'
+            }}
+          >
+            {[...notices, ...notices].map((notice, index) => (
+              <div
+                key={`${notice._id}-${index}`}
+                className="notice-ticker-item p-3 border-bottom"
+                onClick={() => handleNoticeClick(notice)}
+                style={{
+                  cursor: 'pointer'
+                }}
+              >
+                <div className="flex-grow-1">
 
-          <div className="notice-scroll-container">
-
-            <div
-              className="notice-scroll-track"
-              style={{
-                transform: `translateY(-${currentIndex * 170}px)`
-              }}
-            >
-
-              {notices.map((notice) => (
-                <div
-                  key={notice._id}
-                  className="notice-ticker-item p-3 border-bottom"
-                  onClick={() => handleNoticeClick(notice)}
-                  style={{ cursor: 'pointer' }}
-                >
-
-                  <div className="d-flex align-items-center gap-2 mb-2">
+                  <div className="d-flex align-items-center gap-2 mb-1">
 
                     {isNewNotice(notice.createdAt) && (
                       <span className="new-badge">
@@ -317,16 +217,14 @@ const NoticeTicker = () => {
                     {notice.title}
                   </h6>
 
-                  <p className="text-muted small mb-2 notice-content">
-                    {notice.content?.substring(0, 100)}
-                    {notice.content?.length > 100 ? '...' : ''}
+                  <p className="text-muted small mb-1 notice-content">
+                    {notice.content?.substring(0, 60)}...
                   </p>
 
                   <div className="d-flex justify-content-between align-items-center">
 
                     <small className="text-muted">
                       <FaCalendarAlt className="me-1" />
-
                       {moment(notice.createdAt).format(
                         'DD MMM YYYY'
                       )}
@@ -340,22 +238,60 @@ const NoticeTicker = () => {
                   </div>
 
                 </div>
-              ))}
-
-            </div>
-
+              </div>
+            ))}
           </div>
-
         </Card.Body>
       </Card>
 
+      <style>
+        {`
+          @keyframes noticeScroll {
+            0% {
+              transform: translateY(0);
+            }
+
+            100% {
+              transform: translateY(-50%);
+            }
+          }
+
+          .notice-ticker-scroll:hover {
+            animation-play-state: paused;
+          }
+
+          .new-badge {
+            display: inline-flex;
+            align-items: center;
+          }
+
+          .blink {
+            color: #dc3545;
+            font-weight: bold;
+            animation: newBlink 1s infinite;
+          }
+
+          @keyframes newBlink {
+            0%,
+            50%,
+            100% {
+              opacity: 1;
+            }
+
+            25%,
+            75% {
+              opacity: 0;
+            }
+          }
+        `}
+      </style>
+
       <Modal
         show={showModal}
-        onHide={handleModalClose}
+        onHide={() => setShowModal(false)}
         size="lg"
         centered
       >
-
         <Modal.Header
           closeButton
           className="bg-primary text-white"
@@ -367,7 +303,6 @@ const NoticeTicker = () => {
         </Modal.Header>
 
         <Modal.Body>
-
           {selectedNotice && (
             <div>
 
@@ -405,7 +340,6 @@ const NoticeTicker = () => {
 
                 <div className="text-muted small">
                   <FaUser className="me-1" />
-
                   Posted by:{' '}
                   <strong>
                     {selectedNotice.author?.name || 'Admin'}
@@ -414,7 +348,6 @@ const NoticeTicker = () => {
 
                 <div className="text-muted small">
                   <FaCalendarAlt className="me-1" />
-
                   {moment(selectedNotice.createdAt).format(
                     'DD MMM YYYY, hh:mm A'
                   )}
@@ -422,7 +355,6 @@ const NoticeTicker = () => {
 
                 <div className="text-muted small">
                   <FaEye className="me-1" />
-
                   {selectedNotice.views || 0} views
                 </div>
 
@@ -431,7 +363,6 @@ const NoticeTicker = () => {
               <hr />
 
               <div className="notice-full-content mb-3">
-
                 <p
                   style={{
                     whiteSpace: 'pre-wrap',
@@ -441,7 +372,6 @@ const NoticeTicker = () => {
                 >
                   {selectedNotice.content}
                 </p>
-
               </div>
 
               {selectedNotice.attachments &&
@@ -458,7 +388,6 @@ const NoticeTicker = () => {
                             key={idx}
                             className="mb-1"
                           >
-
                             <a
                               href={getFileUrl(att)}
                               target="_blank"
@@ -466,10 +395,8 @@ const NoticeTicker = () => {
                               className="text-decoration-none"
                             >
                               <FaFilePdf className="me-1 text-danger" />
-
                               {getFileName(att)}
                             </a>
-
                           </li>
                         )
                       )}
@@ -481,14 +408,13 @@ const NoticeTicker = () => {
 
             </div>
           )}
-
         </Modal.Body>
 
         <Modal.Footer>
 
           <Button
             variant="secondary"
-            onClick={handleModalClose}
+            onClick={() => setShowModal(false)}
           >
             Close
           </Button>
@@ -508,7 +434,6 @@ const NoticeTicker = () => {
           </Button>
 
         </Modal.Footer>
-
       </Modal>
     </>
   );
