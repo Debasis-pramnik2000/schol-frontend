@@ -23,7 +23,7 @@ const TeacherAttendance = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/teacher/classes');
+      const response = await api.get('/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -35,7 +35,7 @@ const TeacherAttendance = () => {
   const fetchStudents = async (classId) => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/teacher/classes/${classId}/students`);
+      const response = await api.get(`/teacher/classes/${classId}/students`);
       const initialData = response.data.data.students.map(student => ({
         studentId: student._id,
         name: student.user?.name,
@@ -82,7 +82,7 @@ const TeacherAttendance = () => {
       const classData = classes.find(c => c._id === selectedClass);
       
       const promises = attendanceData.map(attendance => {
-        return api.post('/api/teacher/attendance', {
+        return api.post('/teacher/attendance', {
           studentId: attendance.studentId,
           class: classData.className,
           section: classData.section,

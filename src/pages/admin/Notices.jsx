@@ -32,7 +32,7 @@ const AdminNotices = () => {
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/admin/notices');
+      const response = await api.get('/admin/notices');
       setNotices(response.data.data);
     } catch (error) {
       console.error('Error fetching notices:', error);
@@ -64,10 +64,10 @@ const AdminNotices = () => {
 
     try {
       if (editingNotice) {
-        await api.put(`/api/admin/notices/${editingNotice._id}`, formData);
+        await api.put(`/admin/notices/${editingNotice._id}`, formData);
         toast.success('Notice updated successfully');
       } else {
-        await api.post('/api/admin/notices', formData);
+        await api.post('/admin/notices', formData);
         toast.success('Notice created successfully');
       }
       setShowModal(false);
@@ -83,7 +83,7 @@ const AdminNotices = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this notice?')) {
       try {
-        await api.delete(`/api/admin/notices/${id}`);
+        await api.delete(`/admin/notices/${id}`);
         toast.success('Notice deleted successfully');
         fetchNotices();
       } catch (error) {

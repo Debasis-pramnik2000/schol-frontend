@@ -16,7 +16,7 @@ const TeacherClasses = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/teacher/classes');
+      const response = await api.get('/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);

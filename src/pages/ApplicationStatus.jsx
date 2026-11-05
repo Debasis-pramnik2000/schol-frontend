@@ -48,7 +48,7 @@ const ApplicationStatus = () => {
     setSearched(true);
 
     try {
-      const response = await api.get(`/api/admission/status/${searchNumber}`);
+      const response = await api.get(`/admission/status/${searchNumber}`);
       
       if (response.data.success) {
         setApplication(response.data.data);

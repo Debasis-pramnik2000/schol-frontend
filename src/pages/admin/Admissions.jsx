@@ -63,7 +63,7 @@ const AdminAdmissions = () => {
       params.append('sortBy', filters.sortBy);
       params.append('sortOrder', filters.sortOrder);
 
-      const response = await api.get(`/api/admin/admissions?${params}`);
+      const response = await api.get(`/admin/admissions?${params}`);
       
       setAdmissions(response.data.data.admissions || []);
       setPagination(response.data.data.pagination || {});
@@ -78,7 +78,7 @@ const AdminAdmissions = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/api/admin/admissions/stats');
+      const response = await api.get('/admin/admissions/stats');
       setStats(response.data.data.stats);
     } catch (error) {
       console.error('Fetch stats error:', error);
@@ -122,7 +122,7 @@ const AdminAdmissions = () => {
     setSubmitting(true);
     try {
       const response = await api.put(
-        `/api/admin/admissions/${selectedAdmission._id}/approve`,
+        `/admin/admissions/${selectedAdmission._id}/approve`,
         { remarks: remarks || 'Approved by admin' }
       );
 
@@ -171,7 +171,7 @@ const AdminAdmissions = () => {
     setSubmitting(true);
     try {
       await api.put(
-        `/api/admin/admissions/${selectedAdmission._id}/reject`,
+        `/admin/admissions/${selectedAdmission._id}/reject`,
         { remarks }
       );
 
@@ -199,7 +199,7 @@ const AdminAdmissions = () => {
 
     setSubmitting(true);
     try {
-      await api.delete(`/api/admin/admissions/${selectedAdmission._id}`);
+      await api.delete(`/admin/admissions/${selectedAdmission._id}`);
       toast.success('Admission deleted successfully');
       setShowDeleteModal(false);
       setSelectedAdmission(null);
@@ -222,7 +222,7 @@ const AdminAdmissions = () => {
     if (!window.confirm(`Approve ${selectedIds.length} admission(s)?`)) return;
 
     try {
-      const response = await api.post('/api/admin/admissions/bulk-approve', {
+      const response = await api.post('/admin/admissions/bulk-approve', {
         admissionIds: selectedIds
       });
 
@@ -261,7 +261,7 @@ const AdminAdmissions = () => {
       if (filters.status) params.append('status', filters.status);
 
       const response = await api.get(
-        `/api/admin/admissions/export?${params}`,
+        `/admin/admissions/export?${params}`,
         { responseType: 'blob' }
       );
 

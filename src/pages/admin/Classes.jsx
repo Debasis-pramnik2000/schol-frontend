@@ -59,7 +59,7 @@ const AdminClasses = () => {
     try {
       setLoading(true);
 
-      const response = await api.get('/api/admin/classes');
+      const response = await api.get('/admin/classes');
 
       setClasses(response.data.data || []);
       setError('');
@@ -74,7 +74,7 @@ const AdminClasses = () => {
   const fetchTeachers = async () => {
     try {
       const response = await api.get(
-        '/api/admin/teachers?limit=100'
+        '/admin/teachers?limit=100'
       );
 
       setTeachers(
@@ -88,7 +88,7 @@ const AdminClasses = () => {
   const fetchSubjects = async () => {
     try {
       const response = await api.get(
-        '/api/admin/subjects'
+        '/admin/subjects'
       );
 
       setSubjects(response.data.data || []);
@@ -113,7 +113,7 @@ const AdminClasses = () => {
 
       if (editingClass) {
         const response = await api.put(
-          `/api/admin/classes/${editingClass._id}`,
+          `/admin/classes/${editingClass._id}`,
           {
             className: formData.className,
             section: formData.section,
@@ -130,7 +130,7 @@ const AdminClasses = () => {
 
         if (formData.classTeacher) {
           await api.put(
-            `/api/admin/classes/${classId}/assign-teacher`,
+            `/admin/classes/${classId}/assign-teacher`,
             {
               teacherId: formData.classTeacher
             }
@@ -142,7 +142,7 @@ const AdminClasses = () => {
         );
       } else {
         const response = await api.post(
-          '/api/admin/classes',
+          '/admin/classes',
           {
             className: formData.className,
             section: formData.section,
@@ -161,7 +161,7 @@ const AdminClasses = () => {
           formData.classTeacher
         ) {
           await api.put(
-            `/api/admin/classes/${classId}/assign-teacher`,
+            `/admin/classes/${classId}/assign-teacher`,
             {
               teacherId: formData.classTeacher
             }
@@ -199,7 +199,7 @@ const AdminClasses = () => {
     ) {
       try {
         await api.delete(
-          `/api/admin/classes/${id}`
+          `/admin/classes/${id}`
         );
 
         toast.success(
@@ -219,7 +219,7 @@ const AdminClasses = () => {
   const handleAddSubject = async (subjectId) => {
     try {
       await api.post(
-        `/api/admin/classes/${selectedClass._id}/subjects`,
+        `/admin/classes/${selectedClass._id}/subjects`,
         {
           subjectId
         }
@@ -232,7 +232,7 @@ const AdminClasses = () => {
       await fetchClasses();
 
       const response = await api.get(
-        '/api/admin/classes'
+        '/admin/classes'
       );
 
       const updatedClass =
@@ -264,7 +264,7 @@ const AdminClasses = () => {
     ) {
       try {
         await api.delete(
-          `/api/admin/classes/${selectedClass._id}/subjects/${subjectId}`
+          `/admin/classes/${selectedClass._id}/subjects/${subjectId}`
         );
 
         toast.success(
@@ -274,7 +274,7 @@ const AdminClasses = () => {
         await fetchClasses();
 
         const response = await api.get(
-          '/api/admin/classes'
+          '/admin/classes'
         );
 
         const updatedClass =

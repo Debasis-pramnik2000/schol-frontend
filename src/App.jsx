@@ -38,6 +38,7 @@ import TeacherProfile from './pages/teacher/Profile';
 import TeacherTimetable from './pages/teacher/Timetable';
 import TeacherLeave from './pages/teacher/LeaveApplication';
 import TeacherMyStudents from './pages/teacher/MyStudents';
+import TeacherNotices from './pages/teacher/TeacherNotices'
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -125,6 +126,7 @@ function App() {
               <Route path="profile" element={<TeacherProfile />} />
               <Route path="timetable" element={<TeacherTimetable />} />
               <Route path="leaves" element={<TeacherLeave />} />
+              <Route path="notices" element={<TeacherNotices />} />
               <Route path="change-password" element={<ChangePassword />} />
               <Route path="students" element={<TeacherMyStudents />} />
             </Route>

@@ -88,7 +88,7 @@ const AdminTimetable = () => {
     try {
       setLoading(true);
 
-      const response = await api.get('/api/admin/timetable');
+      const response = await api.get('/admin/timetable');
 
       setTimetables(response.data.data);
     } catch (error) {
@@ -101,7 +101,7 @@ const AdminTimetable = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/admin/classes');
+      const response = await api.get('/admin/classes');
 
       setClasses(response.data.data);
     } catch (error) {
@@ -111,7 +111,7 @@ const AdminTimetable = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await api.get('/api/admin/teachers?limit=100');
+      const response = await api.get('/admin/teachers?limit=100');
 
       setTeachers(response.data.data.teachers || []);
     } catch (error) {
@@ -154,13 +154,13 @@ const AdminTimetable = () => {
 
       if (editingTimetable) {
         await api.put(
-          `/api/admin/timetable/${editingTimetable._id}`,
+          `/admin/timetable/${editingTimetable._id}`,
           submitData
         );
 
         toast.success('Timetable updated successfully');
       } else {
-        await api.post('/api/admin/timetable', submitData);
+        await api.post('/admin/timetable', submitData);
 
         toast.success('Timetable created successfully');
       }
@@ -186,7 +186,7 @@ const AdminTimetable = () => {
       )
     ) {
       try {
-        await api.delete(`/api/admin/timetable/${id}`);
+        await api.delete(`/admin/timetable/${id}`);
 
         toast.success('Timetable deleted successfully');
 
@@ -205,7 +205,7 @@ const AdminTimetable = () => {
 
     try {
       await api.post(
-        '/api/admin/timetable/copy',
+        '/admin/timetable/copy',
         copyData
       );
 

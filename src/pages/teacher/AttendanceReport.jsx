@@ -24,7 +24,7 @@ const TeacherAttendanceReport = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/teacher/classes');
+      const response = await api.get('/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -42,7 +42,7 @@ const TeacherAttendanceReport = () => {
     try {
       setLoading(true);
       const response = await api.get(
-        `/api/teacher/attendance/report/${selectedClass}?month=${filters.month}&year=${filters.year}`
+        `/teacher/attendance/report/${selectedClass}?month=${filters.month}&year=${filters.year}`
       );
       setReportData(response.data.data);
     } catch (error) {

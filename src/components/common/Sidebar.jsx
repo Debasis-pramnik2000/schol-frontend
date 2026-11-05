@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 import {
@@ -9,7 +8,6 @@ import {
 } from 'react-bootstrap';
 
 import {
-  FaHome,
   FaUserGraduate,
   FaChalkboardTeacher,
   FaSchool,
@@ -42,8 +40,15 @@ import {
 } from 'react-router-dom';
 
 import { useAuth } from '../../context/AuthContext';
+import { API_ORIGIN } from '../../services/api';
 
 import './Sidebar.css';
+
+const resolvePhotoUrl = (url) => {
+  if (!url) return 'https://via.placeholder.com/80';
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
@@ -390,10 +395,7 @@ const Sidebar = () => {
 
         <div className="profile-image-wrapper">
           <img
-            src={
-              user?.profilePicture ||
-              'https://via.placeholder.com/80'
-            }
+            src={resolvePhotoUrl(user?.profilePicture)}
             alt={user?.name || 'User'}
             className="profile-image"
           />
@@ -466,21 +468,6 @@ const Sidebar = () => {
 
           <span className="sidebar-label">
             Change Password
-          </span>
-        </Nav.Link>
-
-        <Nav.Link
-          as={Link}
-          to="/"
-          className="sidebar-link"
-          onClick={handleClose}
-        >
-          <span className="sidebar-icon">
-            <FaHome />
-          </span>
-
-          <span className="sidebar-label">
-            Home
           </span>
         </Nav.Link>
 
@@ -602,4 +589,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-

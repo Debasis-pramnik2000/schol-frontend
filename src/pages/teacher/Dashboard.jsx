@@ -21,7 +21,7 @@ const TeacherDashboard = () => {
       setLoading(true);
       setError('');
 
-      const response = await api.get('/api/teacher/dashboard');
+      const response = await api.get('/teacher/dashboard');
 
       if (response.data.success) {
         setDashboardData(response.data.data);

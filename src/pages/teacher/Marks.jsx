@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, Row, Col, Card, Table, Form, Button, Spinner, Badge 
+import {
+  Container, Row, Col, Card, Table, Form, Button, Spinner, Badge, Modal, Alert
 } from 'react-bootstrap';
-import { FaPlus, FaSave } from 'react-icons/fa';
+import { FaPlus, FaSave, FaEdit, FaCheck } from 'react-icons/fa';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -17,6 +17,12 @@ const TeacherMarks = () => {
   const [examDate, setExamDate] = useState(new Date().toISOString().split('T')[0]);
   const [marksData, setMarksData] = useState([]);
 
+  const [results, setResults] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingResult, setEditingResult] = useState(null);
+  const [editMarks, setEditMarks] = useState([]);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
   useEffect(() => {
     fetchClasses();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -24,7 +30,7 @@ const TeacherMarks = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/teacher/classes');
+      const response = await api.get('/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -36,13 +42,13 @@ const TeacherMarks = () => {
   const fetchStudents = async (classId) => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/teacher/classes/${classId}/students`);
+      const response = await api.get(`/teacher/classes/${classId}/students`);
       const classInfo = response.data.data.class;
       const studentsList = response.data.data.students;
-      
+
       setClassData(classInfo);
       setStudents(studentsList);
-      
+
       const initialMarks = studentsList.map(student => ({
         studentId: student._id,
         rollNumber: student.rollNumber,
@@ -54,12 +60,31 @@ const TeacherMarks = () => {
         })) || []
       }));
       setMarksData(initialMarks);
+
+      fetchResults(classInfo.className, classInfo.section);
     } catch (error) {
       console.error('Error fetching students:', error);
       toast.error('Failed to load students');
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchResults = async (className, section) => {
+    try {
+      const response = await api.get('/teacher/results', {
+        params: { class: className, section }
+      });
+      setResults(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching results:', error);
+    }
+  };
+
+  const canEdit = (result) => {
+    if (!result.published) return true;
+    if (!result.editDeadline) return false;
+    return new Date() <= new Date(result.editDeadline);
   };
 
   const handleClassChange = (e) => {
@@ -70,10 +95,16 @@ const TeacherMarks = () => {
     } else {
       setStudents([]);
       setMarksData([]);
+      setResults([]);
     }
   };
 
   const handleMarksChange = (studentIndex, subjectIndex, value) => {
+    const num = Number(value);
+    if (value !== '' && (num < 0 || num > 100)) {
+      toast.warning('Marks must be between 0 and 100');
+      return;
+    }
     const updated = [...marksData];
     updated[studentIndex].subjects[subjectIndex].marksObtained = value;
     setMarksData(updated);
@@ -81,7 +112,7 @@ const TeacherMarks = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!examName) {
       toast.warning('Please enter exam name');
       return;
@@ -98,7 +129,7 @@ const TeacherMarks = () => {
           grade: calculateGrade(parseInt(sub.marksObtained) || 0, sub.totalMarks)
         }));
 
-        return api.post('/api/teacher/marks', {
+        return api.post('/teacher/marks', {
           studentId: student.studentId,
           class: classData.className,
           section: classData.section,
@@ -111,7 +142,7 @@ const TeacherMarks = () => {
 
       await Promise.all(promises);
       toast.success('Marks entered successfully!');
-      
+
       setExamName('');
       fetchStudents(selectedClass);
     } catch (error) {
@@ -119,6 +150,51 @@ const TeacherMarks = () => {
       toast.error(error.response?.data?.message || 'Failed to enter marks');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const openEditModal = (result) => {
+    setEditingResult(result);
+    setEditMarks(
+      (result.subjects || []).map(s => ({
+        name: s.name,
+        marksObtained: s.marksObtained,
+        totalMarks: s.totalMarks
+      }))
+    );
+    setShowEditModal(true);
+  };
+
+  const handleEditMarkChange = (index, value) => {
+    const num = Number(value);
+    if (value !== '' && (num < 0 || num > 100)) {
+      toast.warning('Marks must be between 0 and 100');
+      return;
+    }
+    const updated = [...editMarks];
+    updated[index].marksObtained = value;
+    setEditMarks(updated);
+  };
+
+  const handleEditSubmit = async () => {
+    setEditSubmitting(true);
+    try {
+      const subjects = editMarks.map(s => ({
+        name: s.name,
+        marksObtained: parseInt(s.marksObtained) || 0,
+        totalMarks: s.totalMarks,
+        grade: calculateGrade(parseInt(s.marksObtained) || 0, s.totalMarks)
+      }));
+
+      await api.put(`/teacher/results/${editingResult._id}`, { subjects });
+      toast.success('Marks updated successfully!');
+      setShowEditModal(false);
+      fetchResults(classData.className, classData.section);
+    } catch (error) {
+      console.error('Error updating marks:', error);
+      toast.error(error.response?.data?.message || 'Failed to update marks');
+    } finally {
+      setEditSubmitting(false);
     }
   };
 
@@ -194,7 +270,7 @@ const TeacherMarks = () => {
           </Card>
 
           {selectedClass && marksData.length > 0 && (
-            <Card className="shadow-sm">
+            <Card className="shadow-sm mb-4">
               <Card.Header className="fw-bold">
                 <FaPlus className="me-2" />
                 Enter Marks for {classData?.className} - Section {classData?.section}
@@ -232,7 +308,7 @@ const TeacherMarks = () => {
                                   type="number"
                                   size="sm"
                                   min="0"
-                                  max={sub.totalMarks}
+                                  max="100"
                                   value={sub.marksObtained}
                                   onChange={(e) => handleMarksChange(sIndex, subIndex, e.target.value)}
                                   placeholder="Marks"
@@ -246,8 +322,8 @@ const TeacherMarks = () => {
                   </div>
 
                   <div className="text-end mt-3">
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       variant="primary"
                       disabled={submitting || marksData.length === 0}
                     >
@@ -259,8 +335,110 @@ const TeacherMarks = () => {
               </Card.Body>
             </Card>
           )}
+
+          {selectedClass && results.length > 0 && (
+            <Card className="shadow-sm">
+              <Card.Header className="fw-bold">
+                <FaEdit className="me-2" /> Marks Given (Edit within 30 days)
+              </Card.Header>
+              <Card.Body>
+                <div className="table-responsive">
+                  <Table striped hover>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Exam</th>
+                        <th>Marks</th>
+                        <th>Status</th>
+                        <th>Deadline</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {results.map((result, index) => {
+                        const editable = canEdit(result);
+                        const marksText = (result.subjects || [])
+                          .map(s => `${s.name}: ${s.marksObtained}/${s.totalMarks}`)
+                          .join(', ');
+                        return (
+                          <tr key={result._id}>
+                            <td>{index + 1}</td>
+                            <td>{result.student?.rollNumber || 'N/A'}</td>
+                            <td>{result.examName}</td>
+                            <td>
+                              <small>{marksText || '-'}</small>
+                              <div>
+                                <Badge bg="secondary" className="mt-1">
+                                  Total: {result.totalMarks ?? '-'} | Grade: {result.grade || '-'}
+                                </Badge>
+                              </div>
+                            </td>
+                            <td>
+                              <Badge bg={result.published ? 'success' : 'warning'}>
+                                {result.published ? 'Published' : 'Draft'}
+                              </Badge>
+                            </td>
+                            <td>
+                              {result.editDeadline
+                                ? new Date(result.editDeadline).toLocaleDateString()
+                                : '-'}
+                            </td>
+                            <td>
+                              <Button
+                                variant={editable ? 'outline-primary' : 'outline-secondary'}
+                                size="sm"
+                                onClick={() => openEditModal(result)}
+                                disabled={!editable}
+                              >
+                                <FaEdit />
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </Table>
+                </div>
+              </Card.Body>
+            </Card>
+          )}
         </Col>
       </Row>
+
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Marks — {editingResult?.examName}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {editingResult?.editDeadline && (
+            <Alert variant="info" className="py-2">
+              Edit Deadline: {new Date(editingResult.editDeadline).toLocaleDateString()}
+            </Alert>
+          )}
+          {editMarks.map((sub, index) => (
+            <Form.Group key={index} className="mb-3">
+              <Form.Label>{sub.name} (Total: {sub.totalMarks})</Form.Label>
+              <Form.Control
+                type="number"
+                min="0"
+                max="100"
+                value={sub.marksObtained}
+                onChange={(e) => handleEditMarkChange(index, e.target.value)}
+              />
+            </Form.Group>
+          ))}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleEditSubmit} disabled={editSubmitting}>
+            <FaCheck className="me-1" />
+            {editSubmitting ? 'Updating...' : 'Update Marks'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

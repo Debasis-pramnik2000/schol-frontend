@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -30,6 +29,16 @@ import {
 
 import api from '../../services/api';
 import { toast } from 'react-toastify';
+
+// Resolve backend base URL for serving static uploads.
+// api.defaults.baseURL may be "https://scholl-backend-1.onrender.com" or ".../api"
+const API_BASE = (api?.defaults?.baseURL || '').replace(/\/api\/?$/, '');
+
+const resolvePhotoUrl = (url) => {
+  if (!url) return 'https://via.placeholder.com/40';
+  if (/^https?:\/\//i.test(url)) return url; // already absolute
+  return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
@@ -393,10 +402,9 @@ const AdminStudents = () => {
                             <div className="d-flex align-items-center">
 
                               <img
-                                src={
-                                  student.user?.profilePicture ||
-                                  'https://via.placeholder.com/40'
-                                }
+                                src={resolvePhotoUrl(
+                                  student.user?.profilePicture
+                                )}
                                 alt={
                                   student.user?.name || 'Student'
                                 }

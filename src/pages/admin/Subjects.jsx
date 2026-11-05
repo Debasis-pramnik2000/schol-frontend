@@ -55,7 +55,7 @@ const AdminSubjects = () => {
       setLoading(true);
       setError('');
 
-      const response = await api.get('/api/admin/subjects');
+      const response = await api.get('/admin/subjects');
 
       setSubjects(response.data.data || []);
     } catch (error) {
@@ -73,7 +73,7 @@ const AdminSubjects = () => {
   const fetchTeachers = async () => {
     try {
       const response = await api.get(
-        '/api/admin/teachers?limit=100'
+        '/admin/teachers?limit=100'
       );
 
       const teacherData =
@@ -149,14 +149,14 @@ const AdminSubjects = () => {
 
       if (editingSubject) {
         await api.put(
-          `/api/admin/subjects/${editingSubject._id}`,
+          `/admin/subjects/${editingSubject._id}`,
           payload
         );
 
         toast.success('Subject updated successfully');
       } else {
         await api.post(
-          '/api/admin/subjects',
+          '/admin/subjects',
           payload
         );
 
@@ -193,7 +193,7 @@ const AdminSubjects = () => {
 
     try {
       await api.delete(
-        `/api/admin/subjects/${id}`
+        `/admin/subjects/${id}`
       );
 
       toast.success(

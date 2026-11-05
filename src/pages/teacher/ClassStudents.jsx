@@ -18,7 +18,7 @@ const TeacherClassStudents = () => {
 
   const fetchClassStudents = async () => {
     try {
-      const response = await api.get(`/api/teacher/classes/${classId}/students`);
+      const response = await api.get(`/teacher/classes/${classId}/students`);
       setClassData(response.data.data.class);
       setStudents(response.data.data.students);
     } catch (error) {
@@ -90,8 +90,8 @@ const TeacherClassStudents = () => {
                         <td>{index + 1}</td>
                         <td>
                           <div className="d-flex align-items-center">
-                            <img 
-                              src={student.user?.profilePicture || 'https://via.placeholder.com/40'} 
+                            <img
+                              src={student.user?.profilePicture || 'https://via.placeholder.com/40'}
                               alt={student.user?.name}
                               className="rounded-circle me-2"
                               width={40}

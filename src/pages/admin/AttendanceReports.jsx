@@ -26,7 +26,7 @@ const AdminAttendanceReports = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/admin/classes');
+      const response = await api.get('/admin/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -42,7 +42,7 @@ const AdminAttendanceReports = () => {
       if (filters.month) params.append('month', filters.month);
       if (filters.year) params.append('year', filters.year);
 
-      const response = await api.get(`/api/admin/attendance-reports?${params}`);
+      const response = await api.get(`/admin/attendance-reports?${params}`);
       setReportData(response.data.data);
     } catch (error) {
       console.error('Error fetching report:', error);

@@ -37,7 +37,7 @@ const AdminAdmissionDetail = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await api.get(`/api/admin/admissions/${id}`);
+      const response = await api.get(`/admin/admissions/${id}`);
       
       console.log('📥 Admission Data:', response.data.data);
       console.log('📷 Photo:', response.data.data.studentPhoto);
@@ -95,7 +95,7 @@ const AdminAdmissionDetail = () => {
     setSubmitting(true);
     try {
       const response = await api.put(
-        `/api/admin/admissions/${id}/approve`,
+        `/admin/admissions/${id}/approve`,
         { remarks: remarks || 'Approved by admin' }
       );
 
@@ -135,7 +135,7 @@ const AdminAdmissionDetail = () => {
 
     setSubmitting(true);
     try {
-      await api.put(`/api/admin/admissions/${id}/reject`, { remarks });
+      await api.put(`/admin/admissions/${id}/reject`, { remarks });
       toast.success('Admission rejected successfully');
       setShowRejectModal(false);
       setRemarks('');
@@ -151,7 +151,7 @@ const AdminAdmissionDetail = () => {
   const handleDelete = async () => {
     setSubmitting(true);
     try {
-      await api.delete(`/api/admin/admissions/${id}`);
+      await api.delete(`/admin/admissions/${id}`);
       toast.success('Admission deleted successfully');
       navigate('/admin/admissions');
     } catch (error) {

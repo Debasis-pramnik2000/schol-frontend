@@ -32,7 +32,7 @@ const TeacherMyStudents = () => {
       if (filterClass) params.append('class', filterClass);
       if (filterSection) params.append('section', filterSection);
 
-      const response = await api.get(`/api/teacher/students?${params}`);
+      const response = await api.get(`/teacher/students?${params}`);
       
       setStudents(response.data.data.students || []);
       setClasses(response.data.data.classes || []);

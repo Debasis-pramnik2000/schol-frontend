@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Spinner, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaHome } from "react-icons/fa";
-
 import { 
-  FaUser, FaCalendarAlt, FaPhone, FaIdCard, FaMapMarkerAlt, 
+  FaHome, FaUser, FaCalendarAlt, FaPhone, FaIdCard, FaMapMarkerAlt, 
   FaGraduationCap, FaCamera, FaFileUpload, FaCheckCircle,
   FaSchool, FaUserPlus, FaClipboardList
 } from 'react-icons/fa';
@@ -182,71 +180,101 @@ const OnlineAdmission = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
+  setError('');
 
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const submitData = new FormData();
+  try {
+    const submitData = new FormData();
 
-      submitData.append('studentName', formData.studentName);
-      submitData.append('fatherName', formData.fatherName);
-      submitData.append('motherName', formData.motherName || '');
-      submitData.append('dateOfBirth', formData.dateOfBirth);
-      submitData.append('age', formData.age);
-      submitData.append('gender', formData.gender);
-      submitData.append('mobile', formData.mobile);
-      submitData.append('alternateMobile', formData.alternateMobile || '');
-      submitData.append('aadhaarNumber', formData.aadhaarNumber);
+    // Personal information
+    submitData.append('studentName', formData.studentName.trim());
+    submitData.append('fatherName', formData.fatherName.trim());
+    submitData.append('motherName', formData.motherName || '');
+    submitData.append('dateOfBirth', formData.dateOfBirth);
+    submitData.append('age', formData.age);
+    submitData.append('gender', formData.gender);
+    submitData.append('mobile', formData.mobile);
+    submitData.append('alternateMobile', formData.alternateMobile || '');
+    submitData.append('aadhaarNumber', formData.aadhaarNumber);
 
-      submitData.append('address', JSON.stringify({
+    // Address
+    submitData.append(
+      'address',
+      JSON.stringify({
         street: formData.street,
         city: formData.city,
         state: formData.state,
         pincode: formData.pincode
-      }));
+      })
+    );
 
-      submitData.append('applyingForClass', formData.applyingForClass);
-      submitData.append('section', formData.section);
+    // Class information
+    submitData.append('applyingForClass', formData.applyingForClass);
+    submitData.append('section', formData.section || 'A');
 
-      submitData.append('lastQualification', formData.lastQualification);
-      submitData.append('previousSchool', formData.previousSchool);
-      submitData.append('lastClassPassed', formData.lastClassPassed);
-      submitData.append('percentage', formData.percentage);
-      submitData.append('yearOfPassing', formData.yearOfPassing);
+    // Education information
+    submitData.append('lastQualification', formData.lastQualification);
+    submitData.append('previousSchool', formData.previousSchool);
+    submitData.append('lastClassPassed', formData.lastClassPassed);
+    submitData.append('percentage', formData.percentage);
+    submitData.append('yearOfPassing', formData.yearOfPassing);
 
-      submitData.append('studentPhoto', files.studentPhoto);
-      submitData.append('aadhaarCard', files.aadhaarCard);
-      submitData.append('leavingCertificate', files.leavingCertificate);
-      if (files.marksheet) {
-        submitData.append('marksheet', files.marksheet);
-      }
+    // Required documents
+    submitData.append('studentPhoto', files.studentPhoto);
+    submitData.append('aadhaarCard', files.aadhaarCard);
+    submitData.append('leavingCertificate', files.leavingCertificate);
 
-      const response = await api.post('/api/admission/apply', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      if (response.data.success) {
-        setApplicationNumber(response.data.data.applicationNumber);
-        setShowSuccess(true);
-        toast.success('Application submitted successfully!');
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } catch (error) {
-      console.error('Submit error:', error);
-      const message = error.response?.data?.message || 'Failed to submit application';
-      setError(message);
-      toast.error(message);
-    } finally {
-      setLoading(false);
+    // Optional document
+    if (files.marksheet) {
+      submitData.append('marksheet', files.marksheet);
     }
-  };
+
+    // IMPORTANT: Do not manually set Content-Type.
+    const response = await api.post(
+      '/admission/apply',
+      submitData
+    );
+
+    if (response.data?.success) {
+      setApplicationNumber(
+        response.data.data.applicationNumber
+      );
+
+      setShowSuccess(true);
+      toast.success('Application submitted successfully!');
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      throw new Error(
+        response.data?.message || 'Application submission failed'
+      );
+    }
+
+  } catch (error) {
+    console.error(
+      'Submit error:',
+      error.response?.data || error
+    );
+
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      'Failed to submit application';
+
+    setError(message);
+    toast.error(message);
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   const resetForm = () => {
     setFormData({
@@ -281,22 +309,22 @@ const OnlineAdmission = () => {
                 ABC School - Session 2024-2025
               </p>
             </Col>
-           <Col md={4} className="text-md-end mt-3 mt-md-0">
-  <Link
-    to="/"
-    className="btn btn-light"
-    style={{
-      position: "relative",
-      zIndex: 10,
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "6px",
-      color:"blue"
-    }}
-  >
-    <FaHome /> Back to Home
-  </Link>
-</Col>
+            <Col md={4} className="text-md-end mt-3 mt-md-0">
+              <Link
+                to="/"
+                className="btn btn-light"
+                style={{
+                  position: "relative",
+                  zIndex: 10,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  color: "blue"
+                }}
+              >
+                <FaHome /> Back to Home
+              </Link>
+            </Col>
           </Row>
         </Container>
       </div>

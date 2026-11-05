@@ -30,7 +30,7 @@ const NoticeTicker = () => {
       setLoading(true);
       setError('');
 
-      const response = await api.get('/api/public/notices');
+      const response = await api.get('/public/notices');
       setNotices(response.data.data || []);
     } catch (error) {
       console.error('Error fetching notices:', error);

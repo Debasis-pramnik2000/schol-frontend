@@ -80,7 +80,7 @@ const AdminTeachers = () => {
       setLoading(true);
 
       const response = await api.get(
-        `/api/admin/teachers?page=${page}&limit=10`
+        `/admin/teachers?page=${page}&limit=10`
       );
 
       setTeachers(response.data.data.teachers);
@@ -95,7 +95,7 @@ const AdminTeachers = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/admin/classes');
+      const response = await api.get('/admin/classes');
       setClasses(response.data.data || []);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -145,14 +145,14 @@ const AdminTeachers = () => {
         delete submitData.password;
 
         await api.put(
-          `/api/admin/teachers/${editingTeacher._id}`,
+          `/admin/teachers/${editingTeacher._id}`,
           submitData
         );
 
         toast.success('Teacher updated successfully');
       } else {
         await api.post(
-          '/api/admin/teachers',
+          '/admin/teachers',
           submitData
         );
 
@@ -182,7 +182,7 @@ const AdminTeachers = () => {
     ) {
       try {
         await api.delete(
-          `/api/admin/teachers/${id}`
+          `/admin/teachers/${id}`
         );
 
         toast.success(
@@ -210,7 +210,7 @@ const AdminTeachers = () => {
     ) {
       try {
         await api.put(
-          `/api/admin/teachers/${id}/reset-password`,
+          `/admin/teachers/${id}/reset-password`,
           { newPassword }
         );
 
@@ -316,7 +316,7 @@ const AdminTeachers = () => {
       }
 
       await api.put(
-        `/api/admin/classes/${selectedClass}/assign-teacher`,
+        `/admin/classes/${selectedClass}/assign-teacher`,
         {
           teacherId: teacherUserId
         }

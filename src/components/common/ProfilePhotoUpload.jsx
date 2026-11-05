@@ -1,8 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Button, Spinner, Alert, Image } from 'react-bootstrap';
 import { FaCamera, FaTrash } from 'react-icons/fa';
-import api from '../../services/api';
+import api, { API_ORIGIN } from '../../services/api';
 import { toast } from 'react-toastify';
+
+const resolvePhotoUrl = (url) => {
+  if (!url) return null;
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${API_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
   const [loading, setLoading] = useState(false);
@@ -44,7 +50,7 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
     formData.append('profilePhoto', file);
 
     try {
-      const response = await api.post('/api/auth/upload-photo', formData, {
+      const response = await api.post('/auth/upload-photo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -73,7 +79,7 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
 
     setLoading(true);
     try {
-      const response = await api.delete('/api/auth/remove-photo');
+      const response = await api.delete('/auth/remove-photo');
       if (response.data.success) {
         toast.success('Profile photo removed successfully');
         if (onPhotoUpdate) {
@@ -96,7 +102,7 @@ const ProfilePhotoUpload = ({ currentPhoto, onPhotoUpdate, userId }) => {
     <div className="profile-photo-upload text-center">
       <div className="photo-container mb-3">
         <Image
-          src={preview || currentPhoto || 'https://via.placeholder.com/150'}
+          src={preview || resolvePhotoUrl(currentPhoto) || 'https://via.placeholder.com/150'}
           roundedCircle
           className="profile-photo"
           width={150}

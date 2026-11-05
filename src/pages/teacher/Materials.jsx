@@ -33,7 +33,7 @@ const TeacherMaterials = () => {
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/teacher/materials');
+      const response = await api.get('/teacher/materials');
       setMaterials(response.data.data);
     } catch (error) {
       console.error('Error fetching materials:', error);
@@ -45,7 +45,7 @@ const TeacherMaterials = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await api.get('/api/teacher/classes');
+      const response = await api.get('/teacher/classes');
       setClasses(response.data.data);
     } catch (error) {
       console.error('Error fetching classes:', error);
@@ -64,7 +64,7 @@ const TeacherMaterials = () => {
     setSubmitting(true);
 
     try {
-      await api.post('/api/teacher/materials', formData);
+      await api.post('/teacher/materials', formData);
       toast.success('Study material uploaded successfully');
       setShowModal(false);
       resetForm();
@@ -79,7 +79,7 @@ const TeacherMaterials = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this material?')) {
       try {
-        await api.delete(`/api/teacher/materials/${id}`);
+        await api.delete(`/teacher/materials/${id}`);
         toast.success('Material deleted successfully');
         fetchMaterials();
       } catch (error) {

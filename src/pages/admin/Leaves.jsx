@@ -34,7 +34,7 @@ const AdminLeaves = () => {
       if (filters.month) params.append('month', filters.month);
       if (filters.year) params.append('year', filters.year);
 
-      const response = await api.get(`/api/leave/all?${params}`);
+      const response = await api.get(`/leave/all?${params}`);
       setLeaves(response.data.data);
     } catch (error) {
       console.error('Error fetching leaves:', error);
@@ -50,7 +50,7 @@ const AdminLeaves = () => {
 
     setSubmitting(true);
     try {
-      await api.put(`/api/leave/${selectedLeave._id}`, { 
+      await api.put(`/leave/${selectedLeave._id}`, { 
         status, 
         remarks: remarks || 'No remarks'
       });

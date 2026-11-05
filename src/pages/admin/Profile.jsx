@@ -30,7 +30,7 @@ const AdminProfile = () => {
     setSuccess('');
 
     try {
-      await api.put('/api/admin/profile', formData);
+      await api.put('/admin/profile', formData);
       await updateProfile(formData);
       setSuccess('Profile updated successfully!');
       toast.success('Profile updated successfully!');

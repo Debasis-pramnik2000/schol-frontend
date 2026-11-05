@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useState,
@@ -39,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   // Load user
   const loadUser = useCallback(async () => {
     try {
-      const response = await api.get('/api/auth/me');
+      const response = await api.get('/auth/me');
       setUser(response.data.user);
     } catch (error) {
       console.error('Load user error:', error);
@@ -64,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   // Login
   const login = async (username, password) => {
     try {
-      const response = await api.post('/api/auth/login', {
+      const response = await api.post('/auth/login', {
         username,
         password
       });
@@ -109,7 +108,7 @@ export const AuthProvider = ({ children }) => {
   // Update profile
   const updateProfile = async (formData) => {
     try {
-      const response = await api.put('/api/auth/profile', formData);
+      const response = await api.put('/auth/profile', formData);
 
       setUser(response.data.user);
 
@@ -134,7 +133,7 @@ export const AuthProvider = ({ children }) => {
   // Change password
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      await api.put('/api/auth/change-password', {
+      await api.put('/auth/change-password', {
         currentPassword,
         newPassword
       });
