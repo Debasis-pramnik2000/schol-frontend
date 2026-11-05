@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, Row, Col, Card, Table, Button, Modal, Form, 
-  Spinner, Alert 
+import {
+  Container, Row, Col, Card, Table, Button, Modal, Form,
+  Spinner, Alert, ProgressBar
 } from 'react-bootstrap';
-import { FaPlus, FaTrash, FaFilePdf, FaFileWord, FaFilePowerpoint, FaFile } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaFilePdf, FaFileWord, FaFilePowerpoint, FaFile, FaUpload } from 'react-icons/fa';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -15,14 +15,14 @@ const TeacherMaterials = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     subject: '',
     class: '',
-    section: 'A',
-    fileUrl: '',
-    fileType: 'pdf'
+    section: 'A'
   });
 
   useEffect(() => {
@@ -59,12 +59,49 @@ const TeacherMaterials = () => {
     });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('File size must be less than 50MB');
+      return;
+    }
+    setSelectedFile(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!selectedFile) {
+      toast.warning('Please select a file to upload');
+      return;
+    }
+
     setSubmitting(true);
+    setUploadProgress(0);
 
     try {
-      await api.post('/teacher/materials', formData);
+      const uploadData = new FormData();
+      uploadData.append('file', selectedFile);
+      uploadData.append('title', formData.title);
+      uploadData.append('description', formData.description);
+      uploadData.append('subject', formData.subject);
+      uploadData.append('class', formData.class);
+      uploadData.append('section', formData.section);
+
+      await api.post('/teacher/materials', uploadData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percent);
+        }
+      });
+
       toast.success('Study material uploaded successfully');
       setShowModal(false);
       resetForm();
@@ -73,6 +110,7 @@ const TeacherMaterials = () => {
       toast.error(error.response?.data?.message || 'Failed to upload material');
     } finally {
       setSubmitting(false);
+      setUploadProgress(0);
     }
   };
 
@@ -94,19 +132,19 @@ const TeacherMaterials = () => {
       description: '',
       subject: '',
       class: '',
-      section: 'A',
-      fileUrl: '',
-      fileType: 'pdf'
+      section: 'A'
     });
+    setSelectedFile(null);
+    setUploadProgress(0);
   };
 
   const getFileIcon = (fileType) => {
     const icons = {
-      'pdf': <FaFilePdf className="text-danger" />,
-      'doc': <FaFileWord className="text-primary" />,
-      'docx': <FaFileWord className="text-primary" />,
-      'ppt': <FaFilePowerpoint className="text-warning" />,
-      'pptx': <FaFilePowerpoint className="text-warning" />
+      pdf: <FaFilePdf className="text-danger" />,
+      doc: <FaFileWord className="text-primary" />,
+      docx: <FaFileWord className="text-primary" />,
+      ppt: <FaFilePowerpoint className="text-warning" />,
+      pptx: <FaFilePowerpoint className="text-warning" />
     };
     return icons[fileType] || <FaFile className="text-secondary" />;
   };
@@ -161,7 +199,8 @@ const TeacherMaterials = () => {
                           <td>{material.class}-{material.section}</td>
                           <td>
                             <a href={material.fileUrl} target="_blank" rel="noopener noreferrer">
-                              {getFileIcon(material.fileType)} {material.fileType.toUpperCase()}
+                              {getFileIcon(material.fileType)}{' '}
+                              {(material.fileType || 'file').toUpperCase()}
                             </a>
                           </td>
                           <td>
@@ -170,8 +209,8 @@ const TeacherMaterials = () => {
                             </small>
                           </td>
                           <td>
-                            <Button 
-                              variant="outline-danger" 
+                            <Button
+                              variant="outline-danger"
                               size="sm"
                               onClick={() => handleDelete(material._id)}
                             >
@@ -237,27 +276,6 @@ const TeacherMaterials = () => {
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>File Type</Form.Label>
-                  <Form.Select
-                    name="fileType"
-                    value={formData.fileType}
-                    onChange={handleChange}
-                  >
-                    <option value="pdf">PDF</option>
-                    <option value="doc">Word (DOC)</option>
-                    <option value="docx">Word (DOCX)</option>
-                    <option value="ppt">PowerPoint (PPT)</option>
-                    <option value="pptx">PowerPoint (PPTX)</option>
-                    <option value="mp4">Video (MP4)</option>
-                    <option value="other">Other</option>
-                  </Form.Select>
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
                   <Form.Label>Class</Form.Label>
                   <Form.Select
                     name="class"
@@ -273,6 +291,9 @@ const TeacherMaterials = () => {
                   </Form.Select>
                 </Form.Group>
               </Col>
+            </Row>
+
+            <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label>Section</Form.Label>
@@ -290,25 +311,38 @@ const TeacherMaterials = () => {
             </Row>
 
             <Form.Group className="mb-3">
-              <Form.Label>File URL *</Form.Label>
+              <Form.Label>File *</Form.Label>
               <Form.Control
-                type="url"
-                name="fileUrl"
-                value={formData.fileUrl}
-                onChange={handleChange}
-                required
-                placeholder="https://example.com/file.pdf"
+                type="file"
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.jpg,.jpeg,.png,.zip"
               />
               <Form.Text className="text-muted">
-                Enter the URL of the uploaded file (Google Drive, Dropbox, etc.)
+                Max size 50MB. Allowed: PDF, DOC, DOCX, PPT, PPTX, MP4, Images, ZIP
               </Form.Text>
+              {selectedFile && (
+                <div className="mt-2">
+                  <small className="text-success">
+                    Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                  </small>
+                </div>
+              )}
             </Form.Group>
+
+            {submitting && uploadProgress > 0 && (
+              <ProgressBar
+                now={uploadProgress}
+                label={`${uploadProgress}%`}
+                className="mb-3"
+              />
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
             </Button>
             <Button variant="primary" type="submit" disabled={submitting}>
+              <FaUpload className="me-1" />
               {submitting ? 'Uploading...' : 'Upload'}
             </Button>
           </Modal.Footer>
