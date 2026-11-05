@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Form, Button, Alert, Image, Badge } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Form, Button, Alert, Image, Badge, Spinner } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import ProfilePhotoUpload from '../../components/common/ProfilePhotoUpload';
 import { FaUser, FaEnvelope, FaPhone, FaChalkboardTeacher } from 'react-icons/fa';
@@ -9,15 +9,38 @@ import { toast } from 'react-toastify';
 const TeacherProfile = () => {
   const { user, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    qualification: user?.qualification || '',
-    specialization: user?.specialization || '',
+    name: '',
+    email: '',
+    phone: '',
+    qualification: '',
+    specialization: '',
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
-  const [profilePhoto, setProfilePhoto] = useState(user?.profilePicture || null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/teacher/profile');
+        const d = res.data.data;
+        setFormData({
+          name: d.name || '',
+          email: d.email || '',
+          phone: d.phone || '',
+          qualification: d.qualification || '',
+          specialization: d.specialization || ''
+        });
+        setProfilePhoto(d.profilePicture || null);
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -28,18 +51,18 @@ const TeacherProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
     setSuccess('');
 
     try {
-      await api.put('/api/teacher/profile', formData);
+      await api.put('/teacher/profile', formData);
       await updateProfile(formData);
       setSuccess('Profile updated successfully!');
       toast.success('Profile updated successfully!');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update profile');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -51,6 +74,15 @@ const TeacherProfile = () => {
       updateProfile({ ...formData, profilePicture: '' });
     }
   };
+
+  if (loading) {
+    return (
+      <Container className="text-center py-5">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3">Loading profile...</p>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-4">
@@ -92,10 +124,10 @@ const TeacherProfile = () => {
                   />
                 </Col>
                 <Col md={9}>
-                  <h4>{user?.name}</h4>
+                  <h4>{formData.name || user?.name}</h4>
                   <p className="text-muted">
                     <FaChalkboardTeacher className="me-2" />
-                    {user?.qualification || 'No qualification'} | {user?.specialization || 'No specialization'}
+                    {formData.qualification || 'No qualification'} | {formData.specialization || 'No specialization'}
                   </p>
                   <p className="text-muted">
                     <FaUser className="me-2" />
@@ -103,11 +135,11 @@ const TeacherProfile = () => {
                   </p>
                   <p className="text-muted">
                     <FaEnvelope className="me-2" />
-                    {user?.email}
+                    {formData.email || user?.email}
                   </p>
                   <p className="text-muted">
                     <FaPhone className="me-2" />
-                    {user?.phone || 'No phone number added'}
+                    {formData.phone || 'No phone number added'}
                   </p>
                   <Badge bg="success" className="mt-2">
                     Teacher
@@ -191,9 +223,9 @@ const TeacherProfile = () => {
                   <Button
                     type="submit"
                     variant="primary"
-                    disabled={loading}
+                    disabled={saving}
                   >
-                    {loading ? 'Saving...' : 'Save Changes'}
+                    {saving ? 'Saving...' : 'Save Changes'}
                   </Button>
                 </div>
 
