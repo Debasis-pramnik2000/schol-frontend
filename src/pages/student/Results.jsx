@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Spinner, Table, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner, Alert, Table, Badge } from 'react-bootstrap';
+import { FaFilePdf, FaFileExcel, FaPrint } from 'react-icons/fa';
 import api from '../../services/api';
+import { toast } from 'react-toastify';
 import moment from 'moment';
 
-const StudentResults = () => {
+const StudentReportCard = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState('');
+  const [studentId, setStudentId] = useState('');
 
   useEffect(() => {
     fetchResults();
@@ -16,7 +20,8 @@ const StudentResults = () => {
     try {
       setLoading(true);
       const response = await api.get('/student/results');
-      setResults(response.data.data);
+      setResults(response.data.data || []);
+      setStudentId(response.data.studentId || '');
     } catch (error) {
       console.error('Error fetching results:', error);
       setError('Failed to load results');
@@ -25,11 +30,87 @@ const StudentResults = () => {
     }
   };
 
+  const handleBlobError = async (error, fallback) => {
+    let msg = fallback;
+    if (error.response?.data instanceof Blob) {
+      try {
+        const text = await error.response.data.text();
+        const json = JSON.parse(text);
+        msg = json.message || msg;
+      } catch (e) {}
+    } else if (error.response?.data?.message) {
+      msg = error.response.data.message;
+    }
+    toast.error(msg);
+  };
+
+  const downloadPDF = async () => {
+    if (!studentId) {
+      toast.warning('Student ID not loaded');
+      return;
+    }
+    setDownloading(true);
+    try {
+      const response = await api.get(`/student/report-card/${studentId}`, {
+        responseType: 'blob'
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `report-card-${moment().format('YYYY-MM-DD')}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Report card downloaded successfully!');
+    } catch (error) {
+      console.error('Download error:', error);
+      await handleBlobError(error, 'Failed to download report card');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const downloadExcel = async () => {
+    if (!studentId) {
+      toast.warning('Student ID not loaded');
+      return;
+    }
+    setDownloading(true);
+    try {
+      const response = await api.get(`/student/report-card/excel/${studentId}`, {
+        responseType: 'blob'
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `report-card-${moment().format('YYYY-MM-DD')}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Excel report downloaded successfully!');
+    } catch (error) {
+      console.error('Download error:', error);
+      await handleBlobError(error, 'Failed to download Excel report');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (loading) {
     return (
       <Container className="text-center py-5">
         <Spinner animation="border" variant="primary" />
-        <p className="mt-3">Loading results...</p>
+        <p className="mt-3">Loading report card...</p>
       </Container>
     );
   }
@@ -37,22 +118,53 @@ const StudentResults = () => {
   if (error) {
     return (
       <Container className="py-5">
-        <div className="alert alert-danger">{error}</div>
+        <Alert variant="danger">{error}</Alert>
       </Container>
     );
   }
 
   return (
-    <Container fluid className="py-4">
+    <Container fluid className="py-4" id="report-card">
       <Row>
-        <Col lg={10} className="mx-auto">
-          <h2 className="mb-4">My Results</h2>
-          
+        <Col>
+          <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+            <h2>My Report Card</h2>
+            <div className="d-flex gap-2">
+              <Button
+                variant="danger"
+                onClick={downloadPDF}
+                disabled={downloading || results.length === 0}
+              >
+                <FaFilePdf className="me-2" />
+                {downloading ? 'Downloading...' : 'Download PDF'}
+              </Button>
+              <Button
+                variant="success"
+                onClick={downloadExcel}
+                disabled={downloading || results.length === 0}
+              >
+                <FaFileExcel className="me-2" />
+                Download Excel
+              </Button>
+              <Button
+                variant="info"
+                onClick={handlePrint}
+                disabled={results.length === 0}
+              >
+                <FaPrint className="me-2" />
+                Print
+              </Button>
+            </div>
+          </div>
+
           {results.length > 0 ? (
             results.map((result, index) => (
               <Card className="shadow-sm mb-4" key={index}>
-                <Card.Header className="fw-bold bg-primary text-white">
-                  {result.examName} - {moment(result.examDate).format('DD MMM YYYY')}
+                <Card.Header className="fw-bold bg-primary text-white d-flex justify-content-between">
+                  <span>{result.examName}</span>
+                  <Badge bg={result.published ? 'success' : 'warning'}>
+                    {result.published ? 'Published' : 'Draft'}
+                  </Badge>
                 </Card.Header>
                 <Card.Body>
                   <div className="table-responsive">
@@ -91,7 +203,7 @@ const StudentResults = () => {
                           <td>{result.percentage}%</td>
                         </tr>
                         <tr className="fw-bold">
-                          <td colSpan="4" className="text-end">Grade:</td>
+                          <td colSpan="4" className="text-end">Overall Grade:</td>
                           <td>
                             <Badge bg="success">{result.grade}</Badge>
                           </td>
@@ -105,7 +217,7 @@ const StudentResults = () => {
           ) : (
             <Card className="shadow-sm">
               <Card.Body className="text-center py-5">
-                <p className="text-muted">No results published yet</p>
+                <p className="text-muted">No results available for report card</p>
               </Card.Body>
             </Card>
           )}
@@ -115,4 +227,4 @@ const StudentResults = () => {
   );
 };
 
-export default StudentResults;
+export default StudentReportCard;
