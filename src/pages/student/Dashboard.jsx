@@ -22,7 +22,7 @@ const StudentDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await api.get('/api/student/dashboard');
+      const response = await api.get('/student/dashboard');
       setDashboardData(response.data.data);
     } catch (error) {
       console.error('Error fetching dashboard:', error);

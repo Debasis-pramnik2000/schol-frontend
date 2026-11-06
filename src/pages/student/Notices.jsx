@@ -16,7 +16,7 @@ const StudentNotices = () => {
   const fetchNotices = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/student/notices');
+      const response = await api.get('/student/notices');
       setNotices(response.data.data);
     } catch (error) {
       console.error('Error fetching notices:', error);

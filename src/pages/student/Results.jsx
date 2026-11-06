@@ -15,7 +15,7 @@ const StudentResults = () => {
   const fetchResults = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/student/results');
+      const response = await api.get('/student/results');
       setResults(response.data.data);
     } catch (error) {
       console.error('Error fetching results:', error);

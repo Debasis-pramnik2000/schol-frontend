@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Container, Row, Col, Card, Table, Form, Button, Spinner, Badge, Modal, Alert
 } from 'react-bootstrap';
-import { FaPlus, FaSave, FaEdit, FaCheck } from 'react-icons/fa';
+import { FaPlus, FaSave, FaEdit, FaCheck, FaPaperPlane } from 'react-icons/fa';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
@@ -13,10 +13,13 @@ const TeacherMarks = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
+  const [availableExams, setAvailableExams] = useState([]);
+  const [selectedExam, setSelectedExam] = useState('');
   const [examName, setExamName] = useState('');
   const [examDate, setExamDate] = useState(new Date().toISOString().split('T')[0]);
-  const [marksData, setMarksData] = useState([]);
 
+  const [marksData, setMarksData] = useState([]);
   const [results, setResults] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingResult, setEditingResult] = useState(null);
@@ -25,7 +28,6 @@ const TeacherMarks = () => {
 
   useEffect(() => {
     fetchClasses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchClasses = async () => {
@@ -62,6 +64,7 @@ const TeacherMarks = () => {
       setMarksData(initialMarks);
 
       fetchResults(classInfo.className, classInfo.section);
+      fetchAvailableExams(classInfo.className, classInfo.section);
     } catch (error) {
       console.error('Error fetching students:', error);
       toast.error('Failed to load students');
@@ -81,6 +84,34 @@ const TeacherMarks = () => {
     }
   };
 
+  const fetchAvailableExams = async (className, section) => {
+    try {
+      const response = await api.get('/teacher/exams', {
+        params: { class: className, section }
+      });
+      setAvailableExams(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+    }
+  };
+
+  const handleExamSelect = (e) => {
+    const examId = e.target.value;
+    setSelectedExam(examId);
+
+    if (!examId) {
+      setExamName('');
+      setExamDate(new Date().toISOString().split('T')[0]);
+      return;
+    }
+
+    const exam = availableExams.find(ex => ex._id === examId);
+    if (exam) {
+      setExamName(exam.examName);
+      setExamDate(exam.examDate ? exam.examDate.split('T')[0] : '');
+    }
+  };
+
   const canEdit = (result) => {
     if (!result.published) return true;
     if (!result.editDeadline) return false;
@@ -90,12 +121,15 @@ const TeacherMarks = () => {
   const handleClassChange = (e) => {
     const classId = e.target.value;
     setSelectedClass(classId);
+    setSelectedExam('');
+    setExamName('');
     if (classId) {
       fetchStudents(classId);
     } else {
       setStudents([]);
       setMarksData([]);
       setResults([]);
+      setAvailableExams([]);
     }
   };
 
@@ -114,7 +148,7 @@ const TeacherMarks = () => {
     e.preventDefault();
 
     if (!examName) {
-      toast.warning('Please enter exam name');
+      toast.warning('Please select an exam');
       return;
     }
 
@@ -143,6 +177,7 @@ const TeacherMarks = () => {
       await Promise.all(promises);
       toast.success('Marks entered successfully!');
 
+      setSelectedExam('');
       setExamName('');
       fetchStudents(selectedClass);
     } catch (error) {
@@ -174,6 +209,17 @@ const TeacherMarks = () => {
     const updated = [...editMarks];
     updated[index].marksObtained = value;
     setEditMarks(updated);
+  };
+
+  const handlePublish = async (id) => {
+    if (!window.confirm('Publish this result? After publishing, student will see it.')) return;
+    try {
+      await api.put(`/teacher/results/${id}/publish`);
+      toast.success('Result published successfully');
+      fetchResults(classData.className, classData.section);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to publish');
+    }
   };
 
   const handleEditSubmit = async () => {
@@ -231,10 +277,7 @@ const TeacherMarks = () => {
                 <Col md={4}>
                   <Form.Group>
                     <Form.Label>Select Class</Form.Label>
-                    <Form.Select
-                      value={selectedClass}
-                      onChange={handleClassChange}
-                    >
+                    <Form.Select value={selectedClass} onChange={handleClassChange}>
                       <option value="">Select a class...</option>
                       {classes.map(cls => (
                         <option key={cls._id} value={cls._id}>
@@ -246,13 +289,19 @@ const TeacherMarks = () => {
                 </Col>
                 <Col md={4}>
                   <Form.Group>
-                    <Form.Label>Exam Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="e.g., Mid Term Exam"
-                      value={examName}
-                      onChange={(e) => setExamName(e.target.value)}
-                    />
+                    <Form.Label>Select Exam</Form.Label>
+                    <Form.Select
+                      value={selectedExam}
+                      onChange={handleExamSelect}
+                      disabled={!selectedClass}
+                    >
+                      <option value="">Select exam...</option>
+                      {availableExams.map(exam => (
+                        <option key={exam._id} value={exam._id}>
+                          {exam.examName} ({new Date(exam.examDate).toLocaleDateString()})
+                        </option>
+                      ))}
+                    </Form.Select>
                   </Form.Group>
                 </Col>
                 <Col md={4}>
@@ -261,7 +310,7 @@ const TeacherMarks = () => {
                     <Form.Control
                       type="date"
                       value={examDate}
-                      onChange={(e) => setExamDate(e.target.value)}
+                      readOnly
                     />
                   </Form.Group>
                 </Col>
@@ -325,7 +374,7 @@ const TeacherMarks = () => {
                     <Button
                       type="submit"
                       variant="primary"
-                      disabled={submitting || marksData.length === 0}
+                      disabled={submitting || marksData.length === 0 || !examName}
                     >
                       <FaSave className="me-1" />
                       {submitting ? 'Saving...' : 'Save Marks'}
@@ -352,7 +401,7 @@ const TeacherMarks = () => {
                         <th>Marks</th>
                         <th>Status</th>
                         <th>Deadline</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -385,14 +434,27 @@ const TeacherMarks = () => {
                                 : '-'}
                             </td>
                             <td>
-                              <Button
-                                variant={editable ? 'outline-primary' : 'outline-secondary'}
-                                size="sm"
-                                onClick={() => openEditModal(result)}
-                                disabled={!editable}
-                              >
-                                <FaEdit />
-                              </Button>
+                              <div className="d-flex gap-1">
+                                <Button
+                                  variant={editable ? 'outline-primary' : 'outline-secondary'}
+                                  size="sm"
+                                  onClick={() => openEditModal(result)}
+                                  disabled={!editable}
+                                  title="Edit"
+                                >
+                                  <FaEdit />
+                                </Button>
+                                {!result.published && (
+                                  <Button
+                                    variant="outline-success"
+                                    size="sm"
+                                    onClick={() => handlePublish(result._id)}
+                                    title="Publish"
+                                  >
+                                    <FaPaperPlane />
+                                  </Button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );

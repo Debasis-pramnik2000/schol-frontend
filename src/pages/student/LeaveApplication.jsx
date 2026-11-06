@@ -26,7 +26,7 @@ const StudentLeave = () => {
   const fetchLeaves = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/leave/my-leaves');
+      const response = await api.get('/leave/my-leaves');
       setLeaves(response.data.data.leaves);
       setStatistics(response.data.data.statistics);
     } catch (error) {
@@ -49,7 +49,7 @@ const StudentLeave = () => {
     setSubmitting(true);
 
     try {
-      await api.post('/api/leave/apply', formData);
+      await api.post('/leave/apply', formData);
       toast.success('Leave application submitted successfully!');
       setShowModal(false);
       resetForm();

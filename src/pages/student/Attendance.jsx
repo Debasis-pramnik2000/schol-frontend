@@ -32,7 +32,7 @@ const StudentAttendance = () => {
   const fetchAttendanceHistory = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/student/attendance');
+      const response = await api.get('/student/attendance');
       setAttendanceHistory(response.data.data.records);
       setStatistics(response.data.data.statistics);
     } catch (error) {

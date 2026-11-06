@@ -17,7 +17,7 @@ const StudentMaterials = () => {
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/student/materials');
+      const response = await api.get('/student/materials');
       setMaterials(response.data.data);
     } catch (error) {
       console.error('Error fetching materials:', error);
