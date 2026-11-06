@@ -12,11 +12,13 @@ const AdminExams = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
   const [classes, setClasses] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [formData, setFormData] = useState({
     class: '',
     section: 'A',
     examName: '',
     examDate: '',
+    teacher: '',
     academicYear: new Date().getFullYear().toString()
   });
   const [submitting, setSubmitting] = useState(false);
@@ -24,6 +26,7 @@ const AdminExams = () => {
   useEffect(() => {
     fetchExams();
     fetchClasses();
+    fetchTeachers();
   }, []);
 
   const fetchExams = async () => {
@@ -48,6 +51,15 @@ const AdminExams = () => {
     }
   };
 
+  const fetchTeachers = async () => {
+    try {
+      const response = await api.get('/admin/teachers?limit=1000');
+      setTeachers(response.data.data.teachers || []);
+    } catch (error) {
+      console.error('Error fetching teachers:', error);
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -63,7 +75,8 @@ const AdminExams = () => {
       if (editingExam) {
         await api.put(`/admin/exams/${editingExam._id}`, {
           examName: formData.examName,
-          examDate: formData.examDate
+          examDate: formData.examDate,
+          teacher: formData.teacher || null
         });
         toast.success('Exam updated successfully');
       } else {
@@ -108,6 +121,7 @@ const AdminExams = () => {
       section: 'A',
       examName: '',
       examDate: '',
+      teacher: '',
       academicYear: new Date().getFullYear().toString()
     });
     setEditingExam(null);
@@ -125,9 +139,17 @@ const AdminExams = () => {
       section: exam.section,
       examName: exam.examName,
       examDate: exam.examDate ? exam.examDate.split('T')[0] : '',
+      teacher: exam.teacher?._id || exam.teacher || '',
       academicYear: exam.academicYear
     });
     setShowModal(true);
+  };
+
+  const getTeacherName = (exam) => {
+    if (exam.teacher?.user?.name) return exam.teacher.user.name;
+    if (exam.teacher?.name) return exam.teacher.name;
+    const t = teachers.find(t => (t._id === exam.teacher || t.user?._id === exam.teacher));
+    return t?.user?.name || '-';
   };
 
   if (loading) {
@@ -162,6 +184,7 @@ const AdminExams = () => {
                       <th>Class</th>
                       <th>Exam Name</th>
                       <th>Date</th>
+                      <th>Teacher</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -173,6 +196,7 @@ const AdminExams = () => {
                         <td>{exam.class}-{exam.section}</td>
                         <td>{exam.examName}</td>
                         <td>{moment(exam.examDate).format('DD MMM YYYY')}</td>
+                        <td>{getTeacherName(exam)}</td>
                         <td>
                           <Badge bg={exam.published ? 'success' : 'warning'}>
                             {exam.published ? 'Published' : 'Draft'}
@@ -284,6 +308,26 @@ const AdminExams = () => {
                     value={formData.examDate}
                     onChange={handleChange}
                   />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={12}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Assign Teacher</Form.Label>
+                  <Form.Select
+                    name="teacher"
+                    value={formData.teacher}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Teacher</option>
+                    {teachers.map(t => (
+                      <option key={t._id} value={t.user?._id || t._id}>
+                        {t.user?.name} ({t.employeeId})
+                      </option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
             </Row>

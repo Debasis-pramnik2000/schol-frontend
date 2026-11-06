@@ -11,11 +11,7 @@ import {
   Badge
 } from 'react-bootstrap';
 
-import {
-  FaFilePdf,
-  FaFileExcel,
-  FaPrint
-} from 'react-icons/fa';
+import { FaFilePdf } from 'react-icons/fa';
 
 import api from '../../services/api';
 import { toast } from 'react-toastify';
@@ -33,7 +29,6 @@ const StudentReportCard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch student results and correct Student ID
   const fetchStudentData = async () => {
     try {
       setLoading(true);
@@ -61,7 +56,6 @@ const StudentReportCard = () => {
     }
   };
 
-  // Download PDF Report Card
   const downloadPDF = async () => {
     if (!studentId) {
       toast.error('Student ID not found');
@@ -108,59 +102,6 @@ const StudentReportCard = () => {
     }
   };
 
-  // Download Excel Report Card
-  const downloadExcel = async () => {
-    if (!studentId) {
-      toast.error('Student ID not found');
-      return;
-    }
-
-    setDownloading(true);
-
-    try {
-      const response = await api.get(
-        `/student/report-card/excel/${studentId}`,
-        {
-          responseType: 'blob'
-        }
-      );
-
-      const blob = new Blob([response.data], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      });
-
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement('a');
-      link.href = url;
-
-      link.setAttribute(
-        'download',
-        `report-card-${moment().format('YYYY-MM-DD')}.xlsx`
-      );
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-
-      toast.success('Excel report downloaded successfully!');
-
-    } catch (error) {
-      console.error('Excel Download error:', error);
-      toast.error('Failed to download Excel report');
-    } finally {
-      setDownloading(false);
-    }
-  };
-
-  // Print Report Card
-  const handlePrint = () => {
-    window.print();
-  };
-
-  // Loading Screen
   if (loading) {
     return (
       <Container className="text-center py-5">
@@ -170,7 +111,6 @@ const StudentReportCard = () => {
     );
   }
 
-  // Error Screen
   if (error) {
     return (
       <Container className="py-5">
@@ -194,24 +134,6 @@ const StudentReportCard = () => {
               >
                 <FaFilePdf className="me-2" />
                 {downloading ? 'Downloading...' : 'Download PDF'}
-              </Button>
-
-              <Button
-                variant="success"
-                onClick={downloadExcel}
-                disabled={downloading || results.length === 0 || !studentId}
-              >
-                <FaFileExcel className="me-2" />
-                Download Excel
-              </Button>
-
-              <Button
-                variant="info"
-                onClick={handlePrint}
-                disabled={results.length === 0}
-              >
-                <FaPrint className="me-2" />
-                Print
               </Button>
             </div>
           </div>
