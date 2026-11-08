@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Container, Row, Col, Card, Table, Spinner, Alert, 
-  Badge, Form, Button, InputGroup 
+import {
+  Container, Row, Col, Card, Table, Spinner, Alert,
+  Badge, Form, Button, InputGroup
 } from 'react-bootstrap';
-import { 
-  FaUsers, FaSearch, FaBook, FaSchool, 
-  FaFilter, FaTimes, FaSync, FaDownload 
+import {
+  FaUsers, FaSearch, FaBook, FaSchool,
+  FaFilter, FaTimes, FaSync, FaDownload
 } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
@@ -20,40 +20,33 @@ const TeacherMyStudents = () => {
   const [filterClass, setFilterClass] = useState('');
   const [filterSection, setFilterSection] = useState('');
   const [statistics, setStatistics] = useState({});
-  const [retryCount, setRetryCount] = useState(0);
 
   const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const params = new URLSearchParams();
       if (search) params.append('search', search);
       if (filterClass) params.append('class', filterClass);
       if (filterSection) params.append('section', filterSection);
 
       const response = await api.get(`/teacher/students?${params}`);
-      
+
       setStudents(response.data.data.students || []);
       setClasses(response.data.data.classes || []);
       setStatistics({
         totalStudents: response.data.data.totalStudents || 0,
         totalClasses: response.data.data.totalClasses || 0
       });
-      
+
     } catch (error) {
       console.error('Error fetching students:', error);
-      setError('Failed to load students. Please try again.');
-      
-      if (retryCount < 3) {
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-        }, 2000);
-      }
+      setError(error.response?.data?.message || 'Failed to load students.');
     } finally {
       setLoading(false);
     }
-  }, [search, filterClass, filterSection, retryCount]);
+  }, [search, filterClass, filterSection]);
 
   useEffect(() => {
     fetchStudents();
@@ -116,11 +109,7 @@ const TeacherMyStudents = () => {
       <Container className="py-5">
         <Alert variant="danger" className="text-center">
           <h5>⚠️ {error}</h5>
-          <Button 
-            variant="outline-primary" 
-            className="mt-2"
-            onClick={fetchStudents}
-          >
+          <Button variant="outline-primary" className="mt-2" onClick={fetchStudents}>
             <FaSync className="me-2" /> Try Again
           </Button>
         </Alert>
@@ -141,16 +130,16 @@ const TeacherMyStudents = () => {
               </p>
             </div>
             <div className="d-flex gap-2">
-              <Button 
-                variant="outline-success" 
+              <Button
+                variant="outline-success"
                 size="sm"
                 onClick={exportToCSV}
                 disabled={students.length === 0}
               >
                 <FaDownload className="me-1" /> Export CSV
               </Button>
-              <Button 
-                variant="outline-primary" 
+              <Button
+                variant="outline-primary"
                 size="sm"
                 onClick={fetchStudents}
                 disabled={loading}
@@ -196,13 +185,13 @@ const TeacherMyStudents = () => {
                 <Card.Body>
                   <h6 className="text-muted">Subjects Taught</h6>
                   <h5 className="text-warning">
-                    {classes.map(c => (
+                    {classes.map(c =>
                       c.subjects?.map((sub, i) => (
                         <Badge bg="warning" className="me-1 text-dark" key={i}>
                           {sub}
                         </Badge>
                       ))
-                    ))}
+                    )}
                   </h5>
                 </Card.Body>
               </Card>
@@ -222,10 +211,7 @@ const TeacherMyStudents = () => {
                       onChange={(e) => setSearch(e.target.value)}
                     />
                     {search && (
-                      <Button 
-                        variant="outline-secondary" 
-                        onClick={() => setSearch('')}
-                      >
+                      <Button variant="outline-secondary" onClick={() => setSearch('')}>
                         <FaTimes />
                       </Button>
                     )}
@@ -255,8 +241,8 @@ const TeacherMyStudents = () => {
                   </Form.Select>
                 </Col>
                 <Col md={2}>
-                  <Button 
-                    variant="outline-secondary" 
+                  <Button
+                    variant="outline-secondary"
                     onClick={clearFilters}
                     className="w-100"
                   >
@@ -290,8 +276,8 @@ const TeacherMyStudents = () => {
                           <td>{index + 1}</td>
                           <td>
                             <div className="d-flex align-items-center">
-                              <img 
-                                src={student.user?.profilePicture || 'https://via.placeholder.com/40'} 
+                              <img
+                                src={student.user?.profilePicture || 'https://via.placeholder.com/40'}
                                 alt={student.user?.name}
                                 className="rounded-circle me-2"
                                 width={40}
@@ -347,8 +333,8 @@ const TeacherMyStudents = () => {
                   <FaUsers size={50} className="text-muted mb-3" />
                   <h5 className="text-muted">No Students Found</h5>
                   <p className="text-muted">
-                    {search || filterClass || filterSection 
-                      ? 'Try adjusting your filters' 
+                    {search || filterClass || filterSection
+                      ? 'Try adjusting your filters'
                       : 'No students are assigned to your classes yet'}
                   </p>
                   {(search || filterClass || filterSection) && (

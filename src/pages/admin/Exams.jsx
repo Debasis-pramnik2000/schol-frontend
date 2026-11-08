@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Spinner, Alert, Table, Badge, Modal } from 'react-bootstrap';
-import { FaPlus, FaEdit, FaTrash, FaCheck } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import moment from 'moment';
+
+const CLASS_OPTIONS = ['V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
 const AdminExams = () => {
   const [exams, setExams] = useState([]);
@@ -11,29 +13,26 @@ const AdminExams = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingExam, setEditingExam] = useState(null);
-  const [classes, setClasses] = useState([]);
-  const [teachers, setTeachers] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [formData, setFormData] = useState({
     class: '',
     section: 'A',
+    subject: '',
     examName: '',
     examDate: '',
-    teacher: '',
     academicYear: new Date().getFullYear().toString()
   });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchExams();
-    fetchClasses();
-    fetchTeachers();
   }, []);
 
   const fetchExams = async () => {
     try {
       setLoading(true);
       const response = await api.get('/admin/exams');
-      setExams(response.data.data);
+      setExams(response.data.data || []);
     } catch (error) {
       console.error('Error fetching exams:', error);
       setError('Failed to load exams');
@@ -42,29 +41,29 @@ const AdminExams = () => {
     }
   };
 
-  const fetchClasses = async () => {
+  const fetchSubjects = async (className, section) => {
     try {
-      const response = await api.get('/admin/classes');
-      setClasses(response.data.data);
+      const response = await api.get('/admin/subjects', {
+        params: { class: className, section }
+      });
+      setSubjects(response.data.data || []);
     } catch (error) {
-      console.error('Error fetching classes:', error);
-    }
-  };
-
-  const fetchTeachers = async () => {
-    try {
-      const response = await api.get('/admin/teachers?limit=1000');
-      setTeachers(response.data.data.teachers || []);
-    } catch (error) {
-      console.error('Error fetching teachers:', error);
+      console.error('Error fetching subjects:', error);
+      setSubjects([]);
     }
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === 'class' || name === 'section') {
+      const newClass = name === 'class' ? value : formData.class;
+      const newSection = name === 'section' ? value : formData.section;
+      if (newClass) {
+        fetchSubjects(newClass, newSection);
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -76,7 +75,7 @@ const AdminExams = () => {
         await api.put(`/admin/exams/${editingExam._id}`, {
           examName: formData.examName,
           examDate: formData.examDate,
-          teacher: formData.teacher || null
+          subject: formData.subject
         });
         toast.success('Exam updated successfully');
       } else {
@@ -90,16 +89,6 @@ const AdminExams = () => {
       toast.error(error.response?.data?.message || 'Operation failed');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handlePublish = async (id) => {
-    try {
-      await api.put(`/admin/exams/${id}/publish`);
-      toast.success('Result published successfully');
-      fetchExams();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to publish result');
     }
   };
 
@@ -119,11 +108,12 @@ const AdminExams = () => {
     setFormData({
       class: '',
       section: 'A',
+      subject: '',
       examName: '',
       examDate: '',
-      teacher: '',
       academicYear: new Date().getFullYear().toString()
     });
+    setSubjects([]);
     setEditingExam(null);
   };
 
@@ -137,19 +127,13 @@ const AdminExams = () => {
     setFormData({
       class: exam.class,
       section: exam.section,
+      subject: exam.subjects?.[0]?.name || '',
       examName: exam.examName,
       examDate: exam.examDate ? exam.examDate.split('T')[0] : '',
-      teacher: exam.teacher?._id || exam.teacher || '',
       academicYear: exam.academicYear
     });
+    fetchSubjects(exam.class, exam.section);
     setShowModal(true);
-  };
-
-  const getTeacherName = (exam) => {
-    if (exam.teacher?.user?.name) return exam.teacher.user.name;
-    if (exam.teacher?.name) return exam.teacher.name;
-    const t = teachers.find(t => (t._id === exam.teacher || t.user?._id === exam.teacher));
-    return t?.user?.name || '-';
   };
 
   if (loading) {
@@ -183,55 +167,71 @@ const AdminExams = () => {
                       <th>#</th>
                       <th>Class</th>
                       <th>Exam Name</th>
-                      <th>Date</th>
-                      <th>Teacher</th>
+                      <th>Subjects & Dates</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {exams.map((exam, index) => (
-                      <tr key={exam._id}>
-                        <td>{index + 1}</td>
-                        <td>{exam.class}-{exam.section}</td>
-                        <td>{exam.examName}</td>
-                        <td>{moment(exam.examDate).format('DD MMM YYYY')}</td>
-                        <td>{getTeacherName(exam)}</td>
-                        <td>
-                          <Badge bg={exam.published ? 'success' : 'warning'}>
-                            {exam.published ? 'Published' : 'Draft'}
-                          </Badge>
-                        </td>
-                        <td>
-                          <div className="d-flex gap-2">
-                            <Button
-                              variant="outline-primary"
-                              size="sm"
-                              onClick={() => openEditModal(exam)}
-                            >
-                              <FaEdit />
-                            </Button>
-                            {!exam.published && (
-                              <Button
-                                variant="outline-success"
-                                size="sm"
-                                onClick={() => handlePublish(exam._id)}
-                              >
-                                <FaCheck />
-                              </Button>
-                            )}
-                            <Button
-                              variant="outline-danger"
-                              size="sm"
-                              onClick={() => handleDelete(exam._id)}
-                              disabled={exam.published}
-                            >
-                              <FaTrash />
-                            </Button>
-                          </div>
+                    {exams.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="text-center py-4 text-muted">
+                          No exams found
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      exams.map((exam, index) => {
+                        const allPublished = (exam.subjects || []).length > 0 &&
+                          exam.subjects.every(s => s.published);
+                        const anyPublished = (exam.subjects || []).some(s => s.published);
+
+                        return (
+                          <tr key={exam._id}>
+                            <td>{index + 1}</td>
+                            <td>{exam.class}-{exam.section}</td>
+                            <td>{exam.examName}</td>
+                            <td>
+                              {(exam.subjects || []).length === 0 ? (
+                                <Badge bg="secondary">No subjects</Badge>
+                              ) : (
+                                exam.subjects.map((sub, i) => (
+                                  <Badge
+                                    key={i}
+                                    bg={sub.published ? 'success' : 'warning'}
+                                    className="me-1"
+                                  >
+                                    {sub.name} {sub.examDate ? `(${moment(sub.examDate).format('DD MMM')})` : ''}
+                                  </Badge>
+                                ))
+                              )}
+                            </td>
+                            <td>
+                              <Badge bg={allPublished ? 'success' : anyPublished ? 'info' : 'warning'}>
+                                {allPublished ? 'Published' : anyPublished ? 'Partial' : 'Draft'}
+                              </Badge>
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="outline-primary"
+                                  size="sm"
+                                  onClick={() => openEditModal(exam)}
+                                >
+                                  <FaEdit />
+                                </Button>
+                                <Button
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => handleDelete(exam._id)}
+                                >
+                                  <FaTrash />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </Table>
               </div>
@@ -243,7 +243,7 @@ const AdminExams = () => {
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
-            {editingExam ? 'Edit Exam' : 'Create New Exam'}
+            {editingExam ? 'Add Subject to Exam' : 'Create New Exam'}
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
@@ -260,10 +260,8 @@ const AdminExams = () => {
                       required
                     >
                       <option value="">Select Class</option>
-                      {classes.map(cls => (
-                        <option key={cls._id} value={cls.className}>
-                          {cls.className} - {cls.section}
-                        </option>
+                      {CLASS_OPTIONS.map((c) => (
+                        <option key={c} value={c}>{c}</option>
                       ))}
                     </Form.Select>
                   </Form.Group>
@@ -297,37 +295,50 @@ const AdminExams = () => {
                     required
                     placeholder="e.g., Mid Term Exam"
                   />
+                  {editingExam && (
+                    <Form.Text className="text-muted">
+                      Same exam name — subject will be added to existing exam.
+                    </Form.Text>
+                  )}
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Exam Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="examDate"
-                    value={formData.examDate}
+                  <Form.Label>Subject *</Form.Label>
+                  <Form.Select
+                    name="subject"
+                    value={formData.subject}
                     onChange={handleChange}
-                  />
+                    required
+                    disabled={!formData.class}
+                  >
+                    <option value="">Select Subject</option>
+                    {subjects.map((s) => (
+                      <option key={s._id} value={s.name}>
+                        {s.name} ({s.code})
+                      </option>
+                    ))}
+                  </Form.Select>
+                  {formData.class && subjects.length === 0 && (
+                    <Form.Text className="text-danger">
+                      No subjects found for this class & section. Please create subjects first.
+                    </Form.Text>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
 
             <Row>
-              <Col md={12}>
+              <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Assign Teacher</Form.Label>
-                  <Form.Select
-                    name="teacher"
-                    value={formData.teacher}
+                  <Form.Label>Exam Date *</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="examDate"
+                    value={formData.examDate}
                     onChange={handleChange}
-                  >
-                    <option value="">Select Teacher</option>
-                    {teachers.map(t => (
-                      <option key={t._id} value={t.user?._id || t._id}>
-                        {t.user?.name} ({t.employeeId})
-                      </option>
-                    ))}
-                  </Form.Select>
+                    required
+                  />
                 </Form.Group>
               </Col>
             </Row>
@@ -337,7 +348,7 @@ const AdminExams = () => {
               Cancel
             </Button>
             <Button variant="primary" type="submit" disabled={submitting}>
-              {submitting ? 'Saving...' : (editingExam ? 'Update' : 'Create')}
+              {submitting ? 'Saving...' : (editingExam ? 'Add Subject' : 'Create Exam')}
             </Button>
           </Modal.Footer>
         </Form>

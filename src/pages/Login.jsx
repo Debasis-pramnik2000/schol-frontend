@@ -37,26 +37,33 @@ const Login = () => {
       return;
     }
 
-    const result = await login(
-      formData.username,
-      formData.password
-    );
+    try {
+      const result = await login(
+        formData.username,
+        formData.password
+      );
 
-    if (result.success) {
-      if (result.user.role === 'student') {
-        navigate('/student/dashboard');
-      } else if (result.user.role === 'teacher') {
-        navigate('/teacher/dashboard');
-      } else if (result.user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (result.user.role === 'parent') {
-        navigate('/parent/dashboard');
+      if (result.success) {
+        if (result.user.role === 'student') {
+          navigate('/student/dashboard');
+        } else if (result.user.role === 'teacher') {
+          navigate('/teacher/dashboard');
+        } else if (result.user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (result.user.role === 'parent') {
+          navigate('/parent/dashboard');
+        } else {
+          setError('Invalid user role');
+        }
+      } else {
+        setError(result.message || 'Login failed. Please try again.');
       }
-    } else {
-      setError(result.message || 'Login failed. Please try again.');
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -107,6 +114,7 @@ const Login = () => {
                       onChange={handleChange}
                       placeholder="Enter your username"
                       size="lg"
+                      autoComplete="username"
                       disabled={loading}
                     />
                   </Form.Group>
@@ -124,6 +132,7 @@ const Login = () => {
                       onChange={handleChange}
                       placeholder="Enter your password"
                       size="lg"
+                      autoComplete="current-password"
                       disabled={loading}
                     />
                   </Form.Group>

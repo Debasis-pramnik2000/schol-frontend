@@ -33,7 +33,7 @@ const TeacherMarks = () => {
   const fetchClasses = async () => {
     try {
       const response = await api.get('/teacher/classes');
-      setClasses(response.data.data);
+      setClasses(response.data.data || []);
     } catch (error) {
       console.error('Error fetching classes:', error);
     } finally {
@@ -55,11 +55,11 @@ const TeacherMarks = () => {
         studentId: student._id,
         rollNumber: student.rollNumber,
         studentName: student.user?.name,
-        subjects: classInfo.subjects?.map(sub => ({
+        subjects: (classInfo.subjects || []).map(sub => ({
           name: sub.name || sub.subject?.name,
           marksObtained: '',
           totalMarks: 100
-        })) || []
+        }))
       }));
       setMarksData(initialMarks);
 
@@ -112,10 +112,18 @@ const TeacherMarks = () => {
     }
   };
 
-  const canEdit = (result) => {
-    if (!result.published) return true;
-    if (!result.editDeadline) return false;
-    return new Date() <= new Date(result.editDeadline);
+  const canEditSubject = (subject) => {
+    if (!subject.published) return true;
+    if (!subject.editDeadline) return false;
+    return new Date() <= new Date(subject.editDeadline);
+  };
+
+  const canEditResult = (result) => {
+    return (result.subjects || []).some(s => canEditSubject(s));
+  };
+
+  const isResultPublished = (result) => {
+    return (result.subjects || []).every(s => s.published);
   };
 
   const handleClassChange = (e) => {
@@ -194,7 +202,9 @@ const TeacherMarks = () => {
       (result.subjects || []).map(s => ({
         name: s.name,
         marksObtained: s.marksObtained,
-        totalMarks: s.totalMarks
+        totalMarks: s.totalMarks,
+        published: s.published,
+        editDeadline: s.editDeadline
       }))
     );
     setShowEditModal(true);
@@ -212,7 +222,7 @@ const TeacherMarks = () => {
   };
 
   const handlePublish = async (id) => {
-    if (!window.confirm('Publish this result? After publishing, student will see it.')) return;
+    if (!window.confirm('Publish your subject marks? After publishing, student will see it.')) return;
     try {
       await api.put(`/teacher/results/${id}/publish`);
       toast.success('Result published successfully');
@@ -225,12 +235,14 @@ const TeacherMarks = () => {
   const handleEditSubmit = async () => {
     setEditSubmitting(true);
     try {
-      const subjects = editMarks.map(s => ({
-        name: s.name,
-        marksObtained: parseInt(s.marksObtained) || 0,
-        totalMarks: s.totalMarks,
-        grade: calculateGrade(parseInt(s.marksObtained) || 0, s.totalMarks)
-      }));
+      const subjects = editMarks
+        .filter(s => canEditSubject(s))
+        .map(s => ({
+          name: s.name,
+          marksObtained: parseInt(s.marksObtained) || 0,
+          totalMarks: s.totalMarks,
+          grade: calculateGrade(parseInt(s.marksObtained) || 0, s.totalMarks)
+        }));
 
       await api.put(`/teacher/results/${editingResult._id}`, { subjects });
       toast.success('Marks updated successfully!');
@@ -326,6 +338,9 @@ const TeacherMarks = () => {
                 <Badge bg="info" className="ms-2">
                   {students.length} Students
                 </Badge>
+                <Badge bg="warning" className="ms-2 text-dark">
+                  Your Subjects Only
+                </Badge>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={handleSubmit}>
@@ -388,7 +403,7 @@ const TeacherMarks = () => {
           {selectedClass && results.length > 0 && (
             <Card className="shadow-sm">
               <Card.Header className="fw-bold">
-                <FaEdit className="me-2" /> Marks Given (Edit within 30 days)
+                <FaEdit className="me-2" /> Marks Given (Your Subjects — Edit within 30 days)
               </Card.Header>
               <Card.Body>
                 <div className="table-responsive">
@@ -406,10 +421,16 @@ const TeacherMarks = () => {
                     </thead>
                     <tbody>
                       {results.map((result, index) => {
-                        const editable = canEdit(result);
+                        const editable = canEditResult(result);
+                        const published = isResultPublished(result);
                         const marksText = (result.subjects || [])
-                          .map(s => `${s.name}: ${s.marksObtained}/${s.totalMarks}`)
+                          .map(s => `${s.name}: ${s.marksObtained}/${s.totalMarks}${s.published ? ' ✓' : ''}`)
                           .join(', ');
+                        const deadlines = (result.subjects || [])
+                          .filter(s => s.editDeadline)
+                          .map(s => new Date(s.editDeadline).toLocaleDateString());
+                        const latestDeadline = deadlines.length > 0 ? deadlines[0] : '-';
+
                         return (
                           <tr key={result._id}>
                             <td>{index + 1}</td>
@@ -417,21 +438,14 @@ const TeacherMarks = () => {
                             <td>{result.examName}</td>
                             <td>
                               <small>{marksText || '-'}</small>
-                              <div>
-                                <Badge bg="secondary" className="mt-1">
-                                  Total: {result.totalMarks ?? '-'} | Grade: {result.grade || '-'}
-                                </Badge>
-                              </div>
                             </td>
                             <td>
-                              <Badge bg={result.published ? 'success' : 'warning'}>
-                                {result.published ? 'Published' : 'Draft'}
+                              <Badge bg={published ? 'success' : 'warning'}>
+                                {published ? 'Published' : 'Draft'}
                               </Badge>
                             </td>
                             <td>
-                              {result.editDeadline
-                                ? new Date(result.editDeadline).toLocaleDateString()
-                                : '-'}
+                              <small>{latestDeadline}</small>
                             </td>
                             <td>
                               <div className="d-flex gap-1">
@@ -444,12 +458,12 @@ const TeacherMarks = () => {
                                 >
                                   <FaEdit />
                                 </Button>
-                                {!result.published && (
+                                {!published && (
                                   <Button
                                     variant="outline-success"
                                     size="sm"
                                     onClick={() => handlePublish(result._id)}
-                                    title="Publish"
+                                    title="Publish your subject"
                                   >
                                     <FaPaperPlane />
                                   </Button>
@@ -473,23 +487,33 @@ const TeacherMarks = () => {
           <Modal.Title>Edit Marks — {editingResult?.examName}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {editingResult?.editDeadline && (
-            <Alert variant="info" className="py-2">
-              Edit Deadline: {new Date(editingResult.editDeadline).toLocaleDateString()}
-            </Alert>
-          )}
-          {editMarks.map((sub, index) => (
-            <Form.Group key={index} className="mb-3">
-              <Form.Label>{sub.name} (Total: {sub.totalMarks})</Form.Label>
-              <Form.Control
-                type="number"
-                min="0"
-                max="100"
-                value={sub.marksObtained}
-                onChange={(e) => handleEditMarkChange(index, e.target.value)}
-              />
-            </Form.Group>
-          ))}
+          {editMarks.map((sub, index) => {
+            const editable = canEditSubject(sub);
+            return (
+              <Form.Group key={index} className="mb-3">
+                <Form.Label>
+                  {sub.name} (Total: {sub.totalMarks})
+                  {sub.published && (
+                    <Badge bg="success" className="ms-2">Published</Badge>
+                  )}
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={sub.marksObtained}
+                  onChange={(e) => handleEditMarkChange(index, e.target.value)}
+                  disabled={!editable}
+                />
+                {sub.published && sub.editDeadline && (
+                  <Form.Text className="text-muted">
+                    Deadline: {new Date(sub.editDeadline).toLocaleDateString()}
+                    {!editable && ' (expired)'}
+                  </Form.Text>
+                )}
+              </Form.Group>
+            );
+          })}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>

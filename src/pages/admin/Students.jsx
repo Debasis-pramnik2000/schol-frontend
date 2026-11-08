@@ -1,44 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Table,
-  Button,
-  Modal,
-  Form,
-  Spinner,
-  Alert,
-  Pagination,
-  Badge
+  Container, Row, Col, Card, Table, Button, Modal, Form,
+  Spinner, Alert, Pagination, Badge
 } from 'react-bootstrap';
-
 import {
-  FaPlus,
-  FaEdit,
-  FaTrash,
-  FaSearch,
-  FaKey,
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaGraduationCap,
-  FaIdCard
+  FaPlus, FaEdit, FaTrash, FaSearch, FaKey, FaUser,
+  FaEnvelope, FaPhone, FaGraduationCap, FaIdCard
 } from 'react-icons/fa';
-
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 
-// Resolve backend base URL for serving static uploads.
-// api.defaults.baseURL may be "https://scholl-backend-1.onrender.com" or ".../api"
 const API_BASE = (api?.defaults?.baseURL || '').replace(/\/api\/?$/, '');
 
 const resolvePhotoUrl = (url) => {
   if (!url) return 'https://via.placeholder.com/40';
-  if (/^https?:\/\//i.test(url)) return url; // already absolute
+  if (/^https?:\/\//i.test(url)) return url;
   return `${API_BASE}${url.startsWith('/') ? '' : '/'}${url}`;
 };
+
+const CLASS_OPTIONS = ['V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
 const AdminStudents = () => {
   const [students, setStudents] = useState([]);
@@ -82,58 +62,24 @@ const AdminStudents = () => {
         `/admin/students?page=${page}&limit=10&search=${encodeURIComponent(search)}`
       );
 
-      console.log('Students API response:', response.data);
-
       const responseData = response.data;
-
-      /*
-        Supports these common backend response formats:
-
-        {
-          data: {
-            students: [],
-            pagination: {}
-          }
-        }
-
-        OR
-
-        {
-          students: [],
-          pagination: {}
-        }
-
-        OR
-
-        {
-          data: []
-        }
-      */
-
       const studentList =
         responseData?.data?.students ||
         responseData?.students ||
-        (Array.isArray(responseData?.data)
-          ? responseData.data
-          : []);
-
+        (Array.isArray(responseData?.data) ? responseData.data : []);
       const paginationData =
-        responseData?.data?.pagination ||
-        responseData?.pagination ||
-        {};
+        responseData?.data?.pagination || responseData?.pagination || {};
 
       setStudents(Array.isArray(studentList) ? studentList : []);
       setPagination(paginationData);
 
     } catch (error) {
       console.error('Error fetching students:', error);
-
       const message =
         error.response?.data?.message ||
         error.response?.data?.error ||
         error.message ||
         'Failed to load students';
-
       setError(message);
     } finally {
       setLoading(false);
@@ -146,10 +92,7 @@ const AdminStudents = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -158,25 +101,18 @@ const AdminStudents = () => {
 
     try {
       if (editingStudent) {
-        await api.put(
-          `/admin/students/${editingStudent._id}`,
-          formData
-        );
-
+        await api.put(`/admin/students/${editingStudent._id}`, formData);
         toast.success('Student updated successfully');
       } else {
         await api.post('/admin/students', formData);
-
         toast.success('Student created successfully');
       }
 
       setShowModal(false);
       resetForm();
       fetchStudents();
-
     } catch (error) {
       console.error('Student save error:', error);
-
       toast.error(
         error.response?.data?.message ||
         error.response?.data?.error ||
@@ -188,49 +124,31 @@ const AdminStudents = () => {
   };
 
   const handleDelete = async (id) => {
-    if (
-      window.confirm(
-        'Are you sure you want to delete this student?'
-      )
-    ) {
-      try {
-        await api.delete(`/admin/students/${id}`);
+    if (!window.confirm('Are you sure you want to delete this student?')) return;
 
-        toast.success('Student deleted successfully');
-
-        fetchStudents();
-
-      } catch (error) {
-        console.error('Delete error:', error);
-
-        toast.error(
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          'Failed to delete student'
-        );
-      }
+    try {
+      await api.delete(`/admin/students/${id}`);
+      toast.success('Student deleted successfully');
+      fetchStudents();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error(
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Failed to delete student'
+      );
     }
   };
 
   const handleResetPassword = async (id) => {
-    const newPassword = prompt(
-      'Enter new password (min 6 characters):'
-    );
+    const newPassword = prompt('Enter new password (min 6 characters):');
 
     if (newPassword && newPassword.length >= 6) {
       try {
-        await api.put(
-          `/admin/students/${id}/reset-password`,
-          {
-            newPassword
-          }
-        );
-
+        await api.put(`/admin/students/${id}/reset-password`, { newPassword });
         toast.success('Password reset successfully');
-
       } catch (error) {
         console.error('Reset password error:', error);
-
         toast.error(
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -238,9 +156,7 @@ const AdminStudents = () => {
         );
       }
     } else if (newPassword !== null) {
-      toast.warning(
-        'Password must be at least 6 characters'
-      );
+      toast.warning('Password must be at least 6 characters');
     }
   };
 
@@ -261,7 +177,6 @@ const AdminStudents = () => {
       dateOfBirth: '',
       gender: 'Male'
     });
-
     setEditingStudent(null);
   };
 
@@ -272,7 +187,6 @@ const AdminStudents = () => {
 
   const openEditModal = (student) => {
     setEditingStudent(student);
-
     setFormData({
       name: student.user?.name || '',
       email: student.user?.email || '',
@@ -280,9 +194,7 @@ const AdminStudents = () => {
       rollNumber: student.rollNumber || '',
       class: student.class || '',
       section: student.section || 'A',
-      academicYear:
-        student.academicYear ||
-        new Date().getFullYear().toString(),
+      academicYear: student.academicYear || new Date().getFullYear().toString(),
       parentName: student.parentName || '',
       parentPhone: student.parentPhone || '',
       address: student.address || '',
@@ -293,7 +205,6 @@ const AdminStudents = () => {
       username: student.user?.username || '',
       password: ''
     });
-
     setShowModal(true);
   };
 
@@ -301,10 +212,7 @@ const AdminStudents = () => {
     return (
       <Container className="text-center py-5">
         <Spinner animation="border" variant="primary" />
-
-        <p className="mt-3">
-          Loading students...
-        </p>
+        <p className="mt-3">Loading students...</p>
       </Container>
     );
   }
@@ -313,56 +221,38 @@ const AdminStudents = () => {
     <Container fluid className="py-4">
       <Row>
         <Col>
-
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2>Student Management</h2>
-
-            <Button
-              variant="primary"
-              onClick={openCreateModal}
-            >
+            <Button variant="primary" onClick={openCreateModal}>
               <FaPlus className="me-2" />
               Add Student
             </Button>
           </div>
 
-          {/* Search Bar */}
           <Card className="shadow-sm mb-4">
             <Card.Body>
-              <Form
-                onSubmit={handleSearch}
-                className="d-flex gap-2"
-              >
+              <Form onSubmit={handleSearch} className="d-flex gap-2">
                 <Form.Control
                   type="text"
                   placeholder="Search by name, roll number, or class..."
                   value={search}
-                  onChange={(e) =>
-                    setSearch(e.target.value)
-                  }
+                  onChange={(e) => setSearch(e.target.value)}
                 />
-
-                <Button
-                  type="submit"
-                  variant="outline-primary"
-                >
+                <Button type="submit" variant="outline-primary">
                   <FaSearch />
                 </Button>
               </Form>
             </Card.Body>
           </Card>
 
-          {/* Students Table */}
           <Card className="shadow-sm">
             <Card.Body>
-
               {error && (
                 <Alert
                   variant="danger"
                   className="d-flex justify-content-between align-items-center"
                 >
                   <span>{error}</span>
-
                   <Button
                     size="sm"
                     variant="outline-danger"
@@ -375,7 +265,6 @@ const AdminStudents = () => {
 
               <div className="table-responsive">
                 <Table striped hover>
-
                   <thead>
                     <tr>
                       <th>#</th>
@@ -388,233 +277,127 @@ const AdminStudents = () => {
                       <th>Actions</th>
                     </tr>
                   </thead>
-
                   <tbody>
-
                     {students.length > 0 ? (
                       students.map((student, index) => (
-
                         <tr key={student._id}>
-
                           <td>{index + 1}</td>
-
                           <td>
                             <div className="d-flex align-items-center">
-
                               <img
-                                src={resolvePhotoUrl(
-                                  student.user?.profilePicture
-                                )}
-                                alt={
-                                  student.user?.name || 'Student'
-                                }
+                                src={resolvePhotoUrl(student.user?.profilePicture)}
+                                alt={student.user?.name || 'Student'}
                                 className="rounded-circle me-2"
                                 width={40}
                                 height={40}
                               />
-
                               <div>
                                 <div className="fw-bold">
-                                  {student.user?.name ||
-                                    'N/A'}
+                                  {student.user?.name || 'N/A'}
                                 </div>
-
                                 <small className="text-muted">
-                                  @
-                                  {student.user?.username ||
-                                    'N/A'}
+                                  @{student.user?.username || 'N/A'}
                                 </small>
                               </div>
-
                             </div>
                           </td>
-
-                          <td>
-                            {student.rollNumber || 'N/A'}
-                          </td>
-
+                          <td>{student.rollNumber || 'N/A'}</td>
                           <td>
                             {student.class || 'N/A'}
-                            {student.section
-                              ? `-${student.section}`
-                              : ''}
+                            {student.section ? `-${student.section}` : ''}
                           </td>
-
+                          <td>{student.user?.email || 'N/A'}</td>
+                          <td>{student.user?.phone || 'N/A'}</td>
                           <td>
-                            {student.user?.email || 'N/A'}
-                          </td>
-
-                          <td>
-                            {student.user?.phone || 'N/A'}
-                          </td>
-
-                          <td>
-                            <Badge
-                              bg={
-                                student.user?.isActive
-                                  ? 'success'
-                                  : 'danger'
-                              }
-                            >
-                              {student.user?.isActive
-                                ? 'Active'
-                                : 'Inactive'}
+                            <Badge bg={student.user?.isActive ? 'success' : 'danger'}>
+                              {student.user?.isActive ? 'Active' : 'Inactive'}
                             </Badge>
                           </td>
-
                           <td>
-
                             <div className="d-flex gap-2">
-
                               <Button
                                 variant="outline-primary"
                                 size="sm"
-                                onClick={() =>
-                                  openEditModal(student)
-                                }
+                                onClick={() => openEditModal(student)}
                               >
                                 <FaEdit />
                               </Button>
-
                               <Button
                                 variant="outline-warning"
                                 size="sm"
-                                onClick={() =>
-                                  handleResetPassword(
-                                    student._id
-                                  )
-                                }
+                                onClick={() => handleResetPassword(student._id)}
                               >
                                 <FaKey />
                               </Button>
-
                               <Button
                                 variant="outline-danger"
                                 size="sm"
-                                onClick={() =>
-                                  handleDelete(
-                                    student._id
-                                  )
-                                }
+                                onClick={() => handleDelete(student._id)}
                               >
                                 <FaTrash />
                               </Button>
-
                             </div>
-
                           </td>
-
                         </tr>
-
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="8"
-                          className="text-center py-4 text-muted"
-                        >
+                        <td colSpan="8" className="text-center py-4 text-muted">
                           No students found
                         </td>
                       </tr>
                     )}
-
                   </tbody>
-
                 </Table>
               </div>
 
-              {/* Pagination */}
               {pagination.pages > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-3">
-
                   <span className="text-muted">
-                    Showing {students.length} of{' '}
-                    {pagination.total || 0} students
+                    Showing {students.length} of {pagination.total || 0} students
                   </span>
-
                   <Pagination>
-
                     <Pagination.Prev
-                      onClick={() =>
-                        fetchStudents(
-                          pagination.page - 1
-                        )
-                      }
-                      disabled={
-                        pagination.page === 1
-                      }
+                      onClick={() => fetchStudents(pagination.page - 1)}
+                      disabled={pagination.page === 1}
                     />
-
-                    {[
-                      ...Array(pagination.pages)
-                    ].map((_, i) => (
-
+                    {[...Array(pagination.pages)].map((_, i) => (
                       <Pagination.Item
                         key={i + 1}
-                        active={
-                          i + 1 === pagination.page
-                        }
-                        onClick={() =>
-                          fetchStudents(i + 1)
-                        }
+                        active={i + 1 === pagination.page}
+                        onClick={() => fetchStudents(i + 1)}
                       >
                         {i + 1}
                       </Pagination.Item>
-
                     ))}
-
                     <Pagination.Next
-                      onClick={() =>
-                        fetchStudents(
-                          pagination.page + 1
-                        )
-                      }
-                      disabled={
-                        pagination.page ===
-                        pagination.pages
-                      }
+                      onClick={() => fetchStudents(pagination.page + 1)}
+                      disabled={pagination.page === pagination.pages}
                     />
-
                   </Pagination>
-
                 </div>
               )}
-
             </Card.Body>
           </Card>
-
         </Col>
       </Row>
 
-      {/* Add/Edit Modal */}
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        size="lg"
-      >
-
+      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
-            {editingStudent
-              ? 'Edit Student'
-              : 'Add New Student'}
+            {editingStudent ? 'Edit Student' : 'Add New Student'}
           </Modal.Title>
         </Modal.Header>
 
         <Form onSubmit={handleSubmit}>
-
           <Modal.Body>
-
             <Row>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
                   <Form.Label>
                     <FaUser className="me-2" />
                     Full Name *
                   </Form.Label>
-
                   <Form.Control
                     type="text"
                     name="name"
@@ -622,18 +405,14 @@ const AdminStudents = () => {
                     onChange={handleChange}
                     required
                   />
-
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
                   <Form.Label>
                     <FaEnvelope className="me-2" />
                     Email *
                   </Form.Label>
-
                   <Form.Control
                     type="email"
                     name="email"
@@ -641,23 +420,18 @@ const AdminStudents = () => {
                     onChange={handleChange}
                     required
                   />
-
                 </Form.Group>
               </Col>
-
             </Row>
 
             {!editingStudent && (
               <Row>
-
                 <Col md={6}>
                   <Form.Group className="mb-3">
-
                     <Form.Label>
                       <FaUser className="me-2" />
                       Username *
                     </Form.Label>
-
                     <Form.Control
                       type="text"
                       name="username"
@@ -665,18 +439,14 @@ const AdminStudents = () => {
                       onChange={handleChange}
                       required
                     />
-
                   </Form.Group>
                 </Col>
-
                 <Col md={6}>
                   <Form.Group className="mb-3">
-
                     <Form.Label>
                       <FaKey className="me-2" />
                       Password *
                     </Form.Label>
-
                     <Form.Control
                       type="password"
                       name="password"
@@ -685,41 +455,32 @@ const AdminStudents = () => {
                       required
                       minLength={6}
                     />
-
                   </Form.Group>
                 </Col>
-
               </Row>
             )}
 
             <Row>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
                   <Form.Label>
                     <FaPhone className="me-2" />
                     Phone
                   </Form.Label>
-
                   <Form.Control
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
                   />
-
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
                   <Form.Label>
                     <FaIdCard className="me-2" />
                     Roll Number *
                   </Form.Label>
-
                   <Form.Control
                     type="text"
                     name="rollNumber"
@@ -727,40 +488,33 @@ const AdminStudents = () => {
                     onChange={handleChange}
                     required
                   />
-
                 </Form.Group>
               </Col>
-
             </Row>
 
             <Row>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
                   <Form.Label>
                     <FaGraduationCap className="me-2" />
                     Class *
                   </Form.Label>
-
-                  <Form.Control
-                    type="text"
+                  <Form.Select
                     name="class"
                     value={formData.class}
                     onChange={handleChange}
                     required
-                  />
-
+                  >
+                    <option value="">Select Class</option>
+                    {CLASS_OPTIONS.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </Form.Select>
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
-                  <Form.Label>
-                    Section
-                  </Form.Label>
-
+                  <Form.Label>Section</Form.Label>
                   <Form.Select
                     name="section"
                     value={formData.section}
@@ -770,106 +524,65 @@ const AdminStudents = () => {
                     <option value="B">B</option>
                     <option value="C">C</option>
                   </Form.Select>
-
                 </Form.Group>
               </Col>
-
             </Row>
 
             <Row>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
-                  <Form.Label>
-                    Parent's Name
-                  </Form.Label>
-
+                  <Form.Label>Parent's Name</Form.Label>
                   <Form.Control
                     type="text"
                     name="parentName"
                     value={formData.parentName}
                     onChange={handleChange}
                   />
-
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
-                  <Form.Label>
-                    Parent's Phone
-                  </Form.Label>
-
+                  <Form.Label>Parent's Phone</Form.Label>
                   <Form.Control
                     type="tel"
                     name="parentPhone"
                     value={formData.parentPhone}
                     onChange={handleChange}
                   />
-
                 </Form.Group>
               </Col>
-
             </Row>
 
             <Row>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
-                  <Form.Label>
-                    Date of Birth
-                  </Form.Label>
-
+                  <Form.Label>Date of Birth</Form.Label>
                   <Form.Control
                     type="date"
                     name="dateOfBirth"
                     value={formData.dateOfBirth}
                     onChange={handleChange}
                   />
-
                 </Form.Group>
               </Col>
-
               <Col md={6}>
                 <Form.Group className="mb-3">
-
-                  <Form.Label>
-                    Gender
-                  </Form.Label>
-
+                  <Form.Label>Gender</Form.Label>
                   <Form.Select
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
                   >
-                    <option value="Male">
-                      Male
-                    </option>
-
-                    <option value="Female">
-                      Female
-                    </option>
-
-                    <option value="Other">
-                      Other
-                    </option>
-
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                   </Form.Select>
-
                 </Form.Group>
               </Col>
-
             </Row>
 
             <Form.Group className="mb-3">
-
-              <Form.Label>
-                Address
-              </Form.Label>
-
+              <Form.Label>Address</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={2}
@@ -877,38 +590,19 @@ const AdminStudents = () => {
                 value={formData.address}
                 onChange={handleChange}
               />
-
             </Form.Group>
-
           </Modal.Body>
 
           <Modal.Footer>
-
-            <Button
-              variant="secondary"
-              onClick={() => setShowModal(false)}
-            >
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
               Cancel
             </Button>
-
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={submitting}
-            >
-              {submitting
-                ? 'Saving...'
-                : editingStudent
-                  ? 'Update'
-                  : 'Create'}
+            <Button variant="primary" type="submit" disabled={submitting}>
+              {submitting ? 'Saving...' : editingStudent ? 'Update' : 'Create'}
             </Button>
-
           </Modal.Footer>
-
         </Form>
-
       </Modal>
-
     </Container>
   );
 };

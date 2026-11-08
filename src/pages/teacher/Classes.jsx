@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Spinner, Button } from 'react-bootstrap';
-import { FaUsers, FaBook, FaUserTie, FaArrowRight } from 'react-icons/fa';
+import { Container, Row, Col, Card, Spinner, Badge } from 'react-bootstrap';
+import { FaUsers, FaBook, FaUserTie } from 'react-icons/fa';
 import api from '../../services/api';
-import { Link } from 'react-router-dom';
 
 const TeacherClasses = () => {
   const [classes, setClasses] = useState([]);
@@ -17,10 +16,10 @@ const TeacherClasses = () => {
   const fetchClasses = async () => {
     try {
       const response = await api.get('/teacher/classes');
-      setClasses(response.data.data);
+      setClasses(response.data.data || []);
     } catch (error) {
       console.error('Error fetching classes:', error);
-      setError('Failed to load classes');
+      setError(error.response?.data?.message || 'Failed to load classes');
     } finally {
       setLoading(false);
     }
@@ -52,7 +51,7 @@ const TeacherClasses = () => {
           {classes.length > 0 ? (
             <Row>
               {classes.map((cls, index) => (
-                <Col md={6} lg={4} key={index}>
+                <Col md={6} lg={4} key={cls._id || index}>
                   <Card className="shadow-sm mb-4">
                     <Card.Header className="bg-primary text-white">
                       <h5 className="mb-0">
@@ -63,7 +62,8 @@ const TeacherClasses = () => {
                       <div className="mb-3">
                         <p className="mb-1">
                           <FaUserTie className="me-2 text-muted" />
-                          <strong>Class Teacher:</strong> {cls.classTeacher?.name || 'Not Assigned'}
+                          <strong>Class Teacher:</strong>{' '}
+                          {cls.classTeacher?.name || 'Not Assigned'}
                         </p>
                         <p className="mb-1">
                           <FaUsers className="me-2 text-muted" />
@@ -74,33 +74,23 @@ const TeacherClasses = () => {
                           <strong>Subjects:</strong> {cls.subjects?.length || 0}
                         </p>
                         <p className="mb-0">
-                          <strong>Academic Year:</strong> {cls.academicYear}
+                          <strong>Academic Year:</strong> {cls.academicYear || 'N/A'}
                         </p>
                       </div>
 
-                      <div className="d-grid gap-2">
-                        <Link to={`/teacher/classes/${cls._id}/students`}>
-                          <Button variant="outline-primary" size="sm" className="w-100">
-                            <FaUsers className="me-1" /> View Students
-                          </Button>
-                        </Link>
-                        <Link to={`/teacher/attendance/${cls._id}`}>
-                          <Button variant="outline-success" size="sm" className="w-100">
-                            <FaArrowRight className="me-1" /> Mark Attendance
-                          </Button>
-                        </Link>
-                        <Link to={`/teacher/marks/${cls._id}`}>
-                          <Button variant="outline-info" size="sm" className="w-100">
-                            <FaBook className="me-1" /> Enter Marks
-                          </Button>
-                        </Link>
-                      </div>
+                      {cls.subjects && cls.subjects.length > 0 && (
+                        <div className="mb-3">
+                          <div className="small text-muted mb-1">Subjects:</div>
+                          <div className="d-flex flex-wrap gap-1">
+                            {cls.subjects.map((s, i) => (
+                              <Badge bg="light" text="dark" key={s._id || i}>
+                                {s.name || s.subject?.name || 'Subject'}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </Card.Body>
-                    <Card.Footer className="bg-light">
-                      <small className="text-muted">
-                        Subjects: {cls.subjects?.map(s => s.subject?.name).join(', ') || 'None'}
-                      </small>
-                    </Card.Footer>
                   </Card>
                 </Col>
               ))}
@@ -108,7 +98,10 @@ const TeacherClasses = () => {
           ) : (
             <Card className="shadow-sm">
               <Card.Body className="text-center py-5">
-                <p className="text-muted">No classes assigned to you</p>
+                <p className="text-muted mb-0">No classes assigned to you</p>
+                <small className="text-muted">
+                  Ask admin to assign you as class teacher or assign subjects to you.
+                </small>
               </Card.Body>
             </Card>
           )}

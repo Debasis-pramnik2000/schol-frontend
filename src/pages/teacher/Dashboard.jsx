@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Badge, Alert } from 'react-bootstrap';
-import { FaChalkboardTeacher, FaUsers, FaClock, FaCalendarCheck, FaBook, FaBell } from 'react-icons/fa';
+import { FaChalkboardTeacher, FaUsers, FaUserGraduate, FaBook, FaBell } from 'react-icons/fa';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
@@ -20,9 +20,7 @@ const TeacherDashboard = () => {
     try {
       setLoading(true);
       setError('');
-
       const response = await api.get('/teacher/dashboard');
-
       if (response.data.success) {
         setDashboardData(response.data.data);
       } else {
@@ -67,7 +65,6 @@ const TeacherDashboard = () => {
     teacher = {},
     statistics = {},
     classes = [],
-    todayTimetable = [],
     recentNotices = []
   } = dashboardData;
 
@@ -87,18 +84,18 @@ const TeacherDashboard = () => {
       link: '/teacher/students'
     },
     {
-      title: "Today's Classes",
-      value: statistics.todayClasses || 0,
-      icon: <FaClock />,
+      title: 'My Students',
+      value: statistics.myStudents || statistics.totalStudents || 0,
+      icon: <FaUserGraduate />,
       color: 'info',
-      link: '/teacher/timetable'
+      link: '/teacher/students'
     },
     {
-      title: "Today's Attendance",
-      value: statistics.todayAttendance || 0,
-      icon: <FaCalendarCheck />,
+      title: 'Subjects',
+      value: statistics.totalSubjects || 0,
+      icon: <FaBook />,
       color: 'warning',
-      link: '/teacher/attendance'
+      link: '/teacher/classes'
     }
   ];
 
@@ -143,45 +140,6 @@ const TeacherDashboard = () => {
 
       <Row>
         <Col lg={7}>
-          <Card className="shadow-sm mb-4">
-            <Card.Header className="fw-bold">
-              <FaClock className="me-2" />
-              Today's Classes
-            </Card.Header>
-            <Card.Body>
-              {todayTimetable && todayTimetable.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>Class</th>
-                        <th>Section</th>
-                        <th>Subject</th>
-                        <th>Time</th>
-                        <th>Room</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {todayTimetable.map((item, index) => (
-                        item.periods?.map((period, pIndex) => (
-                          <tr key={`${index}-${pIndex}`}>
-                            <td>{item.class}</td>
-                            <td>{item.section}</td>
-                            <td>{period.subject?.name || 'N/A'}</td>
-                            <td>{period.startTime} - {period.endTime}</td>
-                            <td>{period.room || 'TBA'}</td>
-                          </tr>
-                        ))
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center text-muted py-3 mb-0">No classes scheduled for today</p>
-              )}
-            </Card.Body>
-          </Card>
-
           <Card className="shadow-sm">
             <Card.Header className="fw-bold d-flex justify-content-between align-items-center">
               <span>
